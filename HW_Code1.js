@@ -222,7 +222,7 @@ function main() {
 
       currentAngle = animate(currentAngle);  // Update the rotation angle
       // Calculate the model matrix
-      modelMatrix.setRotate(currentAngle, 0, 1, 0); // Rotate around the y-axis
+      modelMatrix.setRotate(currentAngle, 1, 0, 0); // Rotate around the y-axis
 
       mvpMatrix.set(vpMatrix).multiply(modelMatrix);
       gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
@@ -264,8 +264,8 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
       console.log(nv);
   }
   nv = nv * 3;
-  console.log(nv);
-  console.log(ni);
+  console.log("nv = ", nv);
+  console.log("ni = ", ni);
 
   // creazione del vettore dei vertici
   var vertices = new Float32Array(nv);
@@ -283,6 +283,8 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
 
   var count = 0;
   var angolo = 0;
+  var ind = 0;
+  var tempInd = 0;
   for(var i = 0; i < (centri.length / 2); i++ ){
       console.log("i = ", i);
       if(distanza[i] > 0){
@@ -297,20 +299,26 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
 
                       angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-                      indices[i*3] = 0;
-                      indices[i*3 + 1]=i+1;
-                      indices[i*3 + 2]=i+2;
-
                       colors[count*3] = g_colors[0] ;
                       colors[count*3 + 1] = g_colors[1] ;
                       colors[count*3 + 2] = g_colors[2] ;
-                      colors[count*3 + 2] = 1 ;
+                      //colors[count*3 + 2] = 1 ;
 
                       count = count + 3;
                   }
+                  var tempInd2 = ind;
+                  tempInd = ind;
                   for( var j = 0; j < precisioneC ; j++ ){
                       console.log("j = ", j);
+                      indices[ind] = tempInd;
+                      indices[ind+1] = tempInd2+1;
+                      indices[ind+2] = tempInd2+2;
+                      ind = ind + 3;
+                      tempInd2 = tempInd2 + 1;
+                      console.log("indici:", indices);
                   }
+                  indices[ind-1] = tempInd + 1;
+
           }
       }else{
           vertices[count] = centri[i];
@@ -326,7 +334,10 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           count = count + 3;
       }
   }
+  console.log("vertici:", vertices);
+  console.log("indici:", indices);
   console.log(colors);
+  //console.log("n indici:", indices.length);
 /*
   //Per ogni vertice:
   for(var i=1; i < nv+1; i++){
