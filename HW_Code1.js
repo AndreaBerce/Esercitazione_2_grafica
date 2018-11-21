@@ -144,7 +144,7 @@ function main() {
 
      changeColor();
      //n = genericHedron(gl, [0,0,0,1], [1,0], 3);
-     n = genericHedron(gl, [0,1,0,0], [0,1], 3);
+     n = genericHedron(gl, [0,1,0,0,0,0], [0,1,0], 3);
 
 
 	   // Iterate over all controllers
@@ -222,7 +222,7 @@ function main() {
 
       currentAngle = animate(currentAngle);  // Update the rotation angle
       // Calculate the model matrix
-      modelMatrix.setRotate(currentAngle, 1, 0, 0); // Rotate around the y-axis
+      modelMatrix.setRotate(currentAngle, -1, 0, 0); // Rotate around the y-axis
 
       mvpMatrix.set(vpMatrix).multiply(modelMatrix);
       gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
@@ -285,10 +285,12 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   var angolo = 0;
   var ind = 0;
   var tempInd = 0;
+  var tempInd2 = 0;
   for(var i = 0; i < (centri.length / 2); i++ ){
       console.log("i = ", i);
       if(distanza[i] > 0){
           var temp = count;
+          console.log("punti");
           if( distanza[i-1] == 0 ){
                   for(var j = 0; j < precisioneC; j++){
                       console.log("j = ", j);
@@ -306,8 +308,8 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
 
                       count = count + 3;
                   }
-                  var tempInd2 = ind;
-                  tempInd = ind;
+                  //var tempInd2 = ind;
+                  //tempInd = ind;
                   for( var j = 0; j < precisioneC ; j++ ){
                       console.log("j = ", j);
                       indices[ind] = tempInd;
@@ -318,25 +320,41 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                       console.log("indici:", indices);
                   }
                   indices[ind-1] = tempInd + 1;
-
           }
       }else{
+          console.log("count = ", count);
+          console.log("punto");
           vertices[count] = centri[i];
           vertices[count + 1] = centri[i + 1];
           vertices[count + 2] = 0;
 
-          colors[count*3] = g_colors[0];
-          colors[count*3 + 1] = g_colors[1];
+          //colors[count*3] = g_colors[0];
+          colors[count*3] = 1;
+          //colors[count*3 + 1] = g_colors[1];
           colors[count*3 + 1] = 1;
-          colors[count*3 + 2] = g_colors[2];
+          //colors[count*3 + 2] = g_colors[2];
           colors[count*3 + 2] = 1;
-
+          console.log("colore:", colors);
           count = count + 3;
+          if( i != 0 ){
+              tempInd = tempInd2 + 1;
+              tempInd2 = tempInd2 - precisioneC + 1;
+              for( var j = 0; j < precisioneC; j++ ){
+                  console.log("j = ", j);
+                  indices[ind] = tempInd;
+                  indices[ind+1] = tempInd2;
+                  indices[ind+2] = tempInd2+1;
+                  ind = ind + 3;
+                  tempInd2 = tempInd2 + 1;
+                  //console.log("indici:", indices);
+              }
+              indices[ind-1] = tempInd2 - precisioneC;
+          }
       }
   }
   console.log("vertici:", vertices);
   console.log("indici:", indices);
-  console.log(colors);
+  console.log("colore:", colors);
   //console.log("n indici:", indices.length);
 /*
   //Per ogni vertice:
@@ -476,7 +494,7 @@ function initArrayBuffer(gl, attribute, data, num, type) {
 
 
 // Rotation angle (degrees/second)
-var ANGLE_STEP = 5.0;
+var ANGLE_STEP = 10.0;
 // Last time that this function was called
 var g_last = Date.now();
 
