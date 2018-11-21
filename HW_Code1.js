@@ -124,7 +124,8 @@ function main() {
 
      changeColor();
      //n = initVertexBuffers(gl);
-     n = genericHedron(gl, [0,1,0,1,0,0,0,0], [0,1,1,0], 4);
+     var raggio = Math.tan(Math.PI/4);
+     n = genericHedron(gl, [0,1,0,1,0,-1,0,-1], [0,1,1,0], 4);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
@@ -145,7 +146,7 @@ function main() {
 
      changeColor();
      //n = genericHedron(gl, [0,0,0,1], [1,0], 3);
-     n = genericHedron(gl, [0,1,0,0,0,0], [0,1,0], 3);
+     n = genericHedron(gl, [0,1,0,-1,0,-1], [0,1,0], 64);
 
 
 	   // Iterate over all controllers
@@ -165,7 +166,8 @@ function main() {
 	   }
 
      changeColor();
-     n = initVertexBuffers(gl);
+     //n = initVertexBuffers(gl);
+     n = genericHedron(gl, [0,1,0,1,0,-1,0,-1], [0,1,1,0], 64);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
@@ -184,7 +186,8 @@ function main() {
 	   }
 
      changeColor();
-     n = initVertexBuffers(gl);
+     //n = initVertexBuffers(gl);
+     n = genericHedron(gl, [0,1, 0,0.75, 0,0.5, 0,0, 0,-0.5, 0,-0.75, 0,-1], [0, 0.25, 0.5, 1, 0.5, 0.25, 0], 64);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
@@ -283,7 +286,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   var indices = new Uint8Array(ni);
 
   var count = 0;
-  var angolo = 0;
+  var angolo = Math.PI / 4;
   var ind = 0;
   var tempInd = 0;
   var tempInd2 = 0;
