@@ -142,7 +142,7 @@ function main() {
 	   }
 
      changeColor();
-     n = initVertexBuffers(gl);
+     n = genericHedron(gl, [0,0,0,1], [1,0], 5);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
@@ -233,6 +233,57 @@ function main() {
       requestAnimationFrame(tick, canvas); // Request that the browser ?calls tick
   };
   tick();
+}
+
+
+
+function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri, distanza punti da centri, precisione cerchi
+  // calcolo numero di vertici della figura
+  var nv = 0;
+  for(var i = 0; i < (centri.length / 2); i++){
+      if(distanza[i] > 0){
+          nv = nv + precisioneC;
+      }else{
+        nv++;
+      }
+  }
+  nv = nv * 3;
+  console.log(nv);
+
+  // creazione del vettore dei vertici
+  var vertices = new Float32Array(nv);
+
+  // 
+  var colors = new Float32Array(nv);
+  for(var i=0; i < 24; i++){
+    colors[i*3] = g_colors[0];
+    colors[i*3+1] = g_colors[1];
+    colors[i*3+2] = g_colors[2];
+  }
+
+  // Indices of the vertices
+  var indices = new Uint8Array(nv);
+
+
+
+
+  // Write the vertex property to buffers (coordinates, colors and normals)
+  if (!initArrayBuffer(gl, 'a_Position', vertices,       3, gl.FLOAT)) return -1;
+  if (!initArrayBuffer(gl, 'a_Color',    colors,  3, gl.FLOAT)) return -1;
+
+  // Unbind the buffer object
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+  // Write the indices to the buffer object
+  var indexBuffer = gl.createBuffer();
+  if (!indexBuffer) {
+    console.log('Failed to create the buffer object');
+    return false;
+  }
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+
+  return indices.length;
 }
 
 
