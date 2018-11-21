@@ -1,5 +1,6 @@
 // hw2.js
 // Vertex shader program
+///////////////////////////////////////////C IAOOOO
 var VSHADER_SOURCE =
   'attribute vec4 a_Position;\n'      + // Vertex coordinates
   'attribute vec4 a_Color;\n'  +        // Vertex Color
