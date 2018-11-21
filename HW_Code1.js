@@ -286,42 +286,88 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   var ind = 0;
   var tempInd = 0;
   var tempInd2 = 0;
-  for(var i = 0; i < (centri.length / 2); i++ ){
+  for(var i = 0; i < (centri.length / 2); i++ ){  // Per ognuno dei punti ricevuti
       console.log("i = ", i);
-      if(distanza[i] > 0){
+      if(distanza[i] > 0){  // Se deve essere un poligono
           var temp = count;
           console.log("punti");
-          if( distanza[i-1] == 0 ){
-                  for(var j = 0; j < precisioneC; j++){
-                      console.log("j = ", j);
+          if( distanza[i-1] == 0 ){ // Se il precedente era un punto con distanza 0
+              for(var j = 0; j < precisioneC; j++){
+                  console.log("j = ", j);
 
-                      vertices[count] = distanza[i] * Math.cos(angolo);        // x
-                      vertices[count+1] = centri[i*2 + 1];                     // y
-                      vertices[count+2] =  distanza[i] * Math.sin(angolo);     // Z
+                  vertices[count] = distanza[i] * Math.cos(angolo);        // x
+                  vertices[count+1] = centri[i*2 + 1];                     // y
+                  vertices[count+2] =  distanza[i] * Math.sin(angolo);     // Z
 
-                      angolo = angolo + ( 2 * Math.PI/precisioneC );
+                  angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-                      colors[count*3] = g_colors[0] ;
-                      colors[count*3 + 1] = g_colors[1] ;
-                      colors[count*3 + 2] = g_colors[2] ;
-                      //colors[count*3 + 2] = 1 ;
+                  colors[count*3] = g_colors[0] ;
+                  colors[count*3 + 1] = g_colors[1] ;
+                  colors[count*3 + 2] = g_colors[2] ;
+                  //colors[count*3 + 2] = 1 ;
 
-                      count = count + 3;
-                  }
-                  //var tempInd2 = ind;
-                  //tempInd = ind;
-                  for( var j = 0; j < precisioneC ; j++ ){
-                      console.log("j = ", j);
-                      indices[ind] = tempInd;
-                      indices[ind+1] = tempInd2+1;
-                      indices[ind+2] = tempInd2+2;
-                      ind = ind + 3;
-                      tempInd2 = tempInd2 + 1;
-                      //console.log("indici:", indices);
-                  }
-                  indices[ind-1] = tempInd + 1;
-          }else{
-              // QUA
+                  count = count + 3;
+              }
+              //var tempInd2 = ind;
+              //tempInd = ind;
+              for( var j = 0; j < precisioneC ; j++ ){
+                  console.log("j = ", j);
+                  indices[ind] = tempInd;
+                  indices[ind+1] = tempInd2+1;
+                  indices[ind+2] = tempInd2+2;
+                  ind = ind + 3;
+                  tempInd2 = tempInd2 + 1;
+                  //console.log("indici:", indices);
+              }
+              indices[ind-1] = tempInd + 1;
+          }else{  // Se il precedente era un poligono
+
+              //In ogni caso, calcolare i punti del poligono
+              for(var j = 0; j < precisioneC; j++){
+                  // vertices
+                  console.log("j = ", j);
+
+                  vertices[count] = distanza[i] * Math.cos(angolo);        // x
+                  vertices[count+1] = centri[i*2 + 1];                     // y
+                  vertices[count+2] =  distanza[i] * Math.sin(angolo);     // Z
+
+                  angolo = angolo + ( 2 * Math.PI/precisioneC );
+
+                  colors[count*3] = g_colors[0] ;
+                  colors[count*3 + 1] = g_colors[1] ;
+                  colors[count*3 + 2] = g_colors[2] ;
+                  //colors[count*3 + 2] = 1 ;
+
+                  count = count + 3;
+                  
+              }
+              // Ogni due lati, un quadrato tra loro e i loro corrispondenti nell'ultimo poligono
+
+              // Se ho per esempio due quadrati e devo fare gli indici dei triangolini in mezzo:
+              /*
+              Precisione : 5
+              indici da mettere:   
+              9,8,4,    4,3,8,    8,7,3,    3,2,7,    7,6,2,    2,1,6,    6,9,1,    1,4,9
+              9,8,4,    8,7,3,    7,6,2,    6,9,1,    4,3,8,    3,2,7,    2,1,6     1,4,9
+
+              1---------2                             6---------7
+              |         |                             |         |
+              |    0    |    la parte prima,          |    5    |    la parte seconda
+              |         |                             |         |
+              4---------3                             9---------8
+
+              */
+              var temp = ind; // Mi salvo dov'era ind prima delle modifiche di questo ciclo
+              for( var j = 0; j < precisioneC ; j++ ){
+                console.log("j = ", j);
+                indices[ind] = indices[temp];
+                indices[ind+1] = indices[temp-1];
+                indices[ind+2] = indices[temp-2];
+                ind = ind + 3;
+                tempInd2 = tempInd2 + 1;
+                //console.log("indici:", indices);
+            }
+            indices[ind-1] = tempInd + 1;
           }
       }else{
           //console.log("count = ", count);
