@@ -317,24 +317,26 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                       indices[ind+2] = tempInd2+2;
                       ind = ind + 3;
                       tempInd2 = tempInd2 + 1;
-                      console.log("indici:", indices);
+                      //console.log("indici:", indices);
                   }
                   indices[ind-1] = tempInd + 1;
+          }else{
+              // QUA
           }
       }else{
-          console.log("count = ", count);
-          console.log("punto");
+          //console.log("count = ", count);
+          //console.log("punto");
           vertices[count] = centri[i];
           vertices[count + 1] = centri[i + 1];
           vertices[count + 2] = 0;
 
-          //colors[count*3] = g_colors[0];
-          colors[count*3] = 1;
-          //colors[count*3 + 1] = g_colors[1];
-          colors[count*3 + 1] = 1;
-          //colors[count*3 + 2] = g_colors[2];
-          colors[count*3 + 2] = 1;
-          console.log("colore:", colors);
+          //colors[count] = g_colors[0];
+          colors[count] = 1;
+          //colors[count + 1] = g_colors[1];
+          colors[count + 1] = 1;
+          //colors[count + 2] = g_colors[2];
+          colors[count + 2] = 1;
+          //console.log("colore:", colors);
           count = count + 3;
           if( i != 0 ){
               tempInd = tempInd2 + 1;
@@ -346,7 +348,6 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                   indices[ind+2] = tempInd2+1;
                   ind = ind + 3;
                   tempInd2 = tempInd2 + 1;
-                  //console.log("indici:", indices);
               }
               indices[ind-1] = tempInd2 - precisioneC;
           }
