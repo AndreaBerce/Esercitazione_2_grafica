@@ -141,8 +141,11 @@ function main() {
     		geometria.torus = false;
 	   }
 
+
      changeColor();
-     n = genericHedron(gl, [0,0,0,1], [1,0], 3);
+     //n = genericHedron(gl, [0,0,0,1], [1,0], 3);
+     n = genericHedron(gl, [0,1,0,0], [0,1], 3);
+
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
@@ -281,27 +284,33 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   var count = 0;
   var angolo = 0;
   for(var i = 0; i < (centri.length / 2); i++ ){
+      console.log("i = ", i);
       if(distanza[i] > 0){
           var temp = count;
-          for(var j = 0; j < precisioneC; j++){
-              vertices[count] = distanza[i] * Math.cos(angolo);        // x
-              vertices[count+1] = centri[i*2 + 1];                     // y
-              vertices[count+2] =  distanza[i] * Math.sin(angolo);     // Z
+          if( distanza[i-1] == 0 ){
+                  for(var j = 0; j < precisioneC; j++){
+                      console.log("j = ", j);
 
-              angolo = angolo + ( 2 * Math.PI/precisioneC );
+                      vertices[count] = distanza[i] * Math.cos(angolo);        // x
+                      vertices[count+1] = centri[i*2 + 1];                     // y
+                      vertices[count+2] =  distanza[i] * Math.sin(angolo);     // Z
 
-              indices[i*3] = 0;
-              indices[i*3 + 1]=i+1;
-              indices[i*3 + 2]=i+2;
+                      angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-              colors[count*3] = g_colors[0];
-              colors[count*3 + 1] = g_colors[1];
-              colors[count*3 + 2] = g_colors[2];
+                      indices[i*3] = 0;
+                      indices[i*3 + 1]=i+1;
+                      indices[i*3 + 2]=i+2;
 
-              count = count + 3;
-          }
-          for( var j = 0; j < precisioneC ; j++ ){
+                      colors[count*3] = g_colors[0] ;
+                      colors[count*3 + 1] = g_colors[1] ;
+                      colors[count*3 + 2] = g_colors[2] ;
+                      colors[count*3 + 2] = 1 ;
 
+                      count = count + 3;
+                  }
+                  for( var j = 0; j < precisioneC ; j++ ){
+                      console.log("j = ", j);
+                  }
           }
       }else{
           vertices[count] = centri[i];
@@ -310,11 +319,14 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
 
           colors[count*3] = g_colors[0];
           colors[count*3 + 1] = g_colors[1];
+          colors[count*3 + 1] = 1;
           colors[count*3 + 2] = g_colors[2];
+          colors[count*3 + 2] = 1;
 
           count = count + 3;
       }
   }
+  console.log(colors);
 /*
   //Per ogni vertice:
   for(var i=1; i < nv+1; i++){
