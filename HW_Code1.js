@@ -302,9 +302,9 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
 
                   angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-                  colors[count*3] = g_colors[0] ;
-                  colors[count*3 + 1] = g_colors[1] ;
-                  colors[count*3 + 2] = g_colors[2] ;
+                  colors[count] = g_colors[0] ;
+                  colors[count + 1] = g_colors[1] ;
+                  colors[count + 2] = g_colors[2] ;
                   //colors[count*3 + 2] = 1 ;
 
                   count = count + 3;
@@ -334,9 +334,9 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
 
                   angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-                  colors[count*3] = g_colors[0] ;
-                  colors[count*3 + 1] = g_colors[1] ;
-                  colors[count*3 + 2] = g_colors[2] ;
+                  colors[count] = g_colors[0] ;
+                  colors[count + 1] = g_colors[1] ;
+                  colors[count + 2] = g_colors[2] ;
                   //colors[count*3 + 2] = 1 ;
 
                   count = count + 3;
@@ -382,12 +382,13 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
               indices[ind-3] = temp;
               indices[ind-2] = tempInd2;
               indices[ind-1] = temp2;
+              tempInd2 = tempInd-1;
           }
       }else{
           //console.log("count = ", count);
           //console.log("punto");
-          vertices[count] = centri[i];
-          vertices[count + 1] = centri[i + 1];
+          vertices[count] = centri[i*2];
+          vertices[count + 1] = centri[i*2 + 1];
           vertices[count + 2] = 0;
 
           //colors[count] = g_colors[0];
@@ -397,12 +398,16 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           //colors[count + 2] = g_colors[2];
           colors[count + 2] = 1;
           //console.log("colore:", colors);
+          console.log("i = ", i);
+          console.log("centri: ", centri);
+          console.log("punto: ", vertices[count], vertices[count+1], vertices[count+2]);
           count = count + 3;
           if( i != 0 ){
+              console.log("tempInd2 = ", tempInd2);
               tempInd = tempInd2 + 1;
               tempInd2 = tempInd2 - precisioneC + 1;
               for( var j = 0; j < precisioneC; j++ ){
-                  console.log("j = ", j);
+                  //console.log("j = ", j);
                   indices[ind] = tempInd;
                   indices[ind+1] = tempInd2;
                   indices[ind+2] = tempInd2+1;
