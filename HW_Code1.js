@@ -142,7 +142,7 @@ function main() {
 	   }
 
      changeColor();
-     n = genericHedron(gl, [0,0,0,1], [1,0], 5);
+     n = genericHedron(gl, [0,0,0,1], [1,0], 3);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
@@ -212,10 +212,10 @@ function main() {
   //*********************************************************************************
   var tick = function() {
     	// read geometria
-    	for(var x in geometria){
+    	/*for(var x in geometria){
     		if(geometria[x] == true)
     			console.log(x);
-    	}
+    	}*/
 
       currentAngle = animate(currentAngle);  // Update the rotation angle
       // Calculate the model matrix
@@ -239,21 +239,35 @@ function main() {
 
 function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri, distanza punti da centri, precisione cerchi
   // calcolo numero di vertici della figura
-  var nv = 0;
+  var nv = 0; // numero vertici
+  var ni = 0; // numero indici
+  var precedentePunto=true;
   for(var i = 0; i < (centri.length / 2); i++){
       if(distanza[i] > 0){
           nv = nv + precisioneC;
+          if(precedentePunto){
+              ni = ni + precisioneC*3;
+          }else{
+              ni = ni + precisioneC*6;
+          }
+          precedentePunto = false;
       }else{
-        nv++;
+          nv++;
+          if( i != 0 ){
+              ni = ni + precisioneC*3;
+          }
+          precedentePunto=true;
       }
+      console.log(nv);
   }
   nv = nv * 3;
   console.log(nv);
+  console.log(ni);
 
   // creazione del vettore dei vertici
   var vertices = new Float32Array(nv);
 
-  // 
+  //
   var colors = new Float32Array(nv);
   for(var i=0; i < 24; i++){
     colors[i*3] = g_colors[0];
@@ -262,8 +276,64 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   }
 
   // Indices of the vertices
-  var indices = new Uint8Array(nv);
+  var indices = new Uint8Array(ni);
 
+  var count = 0;
+  var angolo = 0;
+  for(var i = 0; i < (centri.length / 2); i++ ){
+      if(distanza[i] > 0){
+          var temp = count;
+          for(var j = 0; j < precisioneC; j++){
+              vertices[count] = distanza[i] * Math.cos(angolo);        // x
+              vertices[count+1] = centri[i*2 + 1];                     // y
+              vertices[count+2] =  distanza[i] * Math.sin(angolo);     // Z
+
+              angolo = angolo + ( 2 * Math.PI/precisioneC );
+
+              indices[i*3] = 0;
+              indices[i*3 + 1]=i+1;
+              indices[i*3 + 2]=i+2;
+
+              colors[count*3] = g_colors[0];
+              colors[count*3 + 1] = g_colors[1];
+              colors[count*3 + 2] = g_colors[2];
+
+              count = count + 3;
+          }
+          for( var j = 0; j < precisioneC ; j++ ){
+
+          }
+      }else{
+          vertices[count] = centri[i];
+          vertices[count + 1] = centri[i + 1];
+          vertices[count + 2] = 0;
+
+          colors[count*3] = g_colors[0];
+          colors[count*3 + 1] = g_colors[1];
+          colors[count*3 + 2] = g_colors[2];
+
+          count = count + 3;
+      }
+  }
+/*
+  //Per ogni vertice:
+  for(var i=1; i < nv+1; i++){
+      // Calcolamo le coordinate del vertice corrente
+      vertices[i*3] = raggio * Math.cos(angolo);        // x
+      vertices[i*3 + 1] = raggio * Math.sin(angolo);    // y
+      vertices[i*3 + 2] = 0.0 ;                         // z
+      // Andiamo al prossimo vertice (per il prossimo ciclo)
+      angolo = angolo + ( 2 * Math.PI/nVertici );
+      // Riempie il vettore dei colori
+      colors[i*3] = g_colors[0];
+      colors[i*3 + 1] = g_colors[1];
+      colors[i*3 + 2] = g_colors[2];
+      // Settiamo gli indici del triangolo corrente
+      indices[i*3] = 0;
+      indices[i*3 + 1]=i+1;
+      indices[i*3 + 2]=i+2;
+  }
+*/
 
 
 
