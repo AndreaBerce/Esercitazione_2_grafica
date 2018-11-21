@@ -111,7 +111,7 @@ function main() {
   }
 
 
-  //
+  //------------------------------------------------------------------
   gui.add(geometria,'cube').onFinishChange(function(value) {
     // Fires when a controller loses focus.
 	   if(value == true){
@@ -123,7 +123,8 @@ function main() {
 	   }
 
      changeColor();
-     n = initVertexBuffers(gl);
+     //n = initVertexBuffers(gl);
+     n = genericHedron(gl, [0,1,0,1,0,0,0,0], [0,1,1,0], 4);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
@@ -287,13 +288,13 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   var tempInd = 0;
   var tempInd2 = 0;
   for(var i = 0; i < (centri.length / 2); i++ ){  // Per ognuno dei punti ricevuti
-      console.log("i = ", i);
+      //console.log("i = ", i);
       if(distanza[i] > 0){  // Se deve essere un poligono
-          var temp = count;
-          console.log("punti");
+          //var temp = count;
+          //console.log("punti");
           if( distanza[i-1] == 0 ){ // Se il precedente era un punto con distanza 0
               for(var j = 0; j < precisioneC; j++){
-                  console.log("j = ", j);
+                  //console.log("j = ", j);
 
                   vertices[count] = distanza[i] * Math.cos(angolo);        // x
                   vertices[count+1] = centri[i*2 + 1];                     // y
@@ -311,7 +312,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
               //var tempInd2 = ind;
               //tempInd = ind;
               for( var j = 0; j < precisioneC ; j++ ){
-                  console.log("j = ", j);
+                  //console.log("j = ", j);
                   indices[ind] = tempInd;
                   indices[ind+1] = tempInd2+1;
                   indices[ind+2] = tempInd2+2;
@@ -325,7 +326,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
               //In ogni caso, calcolare i punti del poligono
               for(var j = 0; j < precisioneC; j++){
                   // vertices
-                  console.log("j = ", j);
+                  //console.log("j = ", j);
 
                   vertices[count] = distanza[i] * Math.cos(angolo);        // x
                   vertices[count+1] = centri[i*2 + 1];                     // y
@@ -339,14 +340,14 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                   //colors[count*3 + 2] = 1 ;
 
                   count = count + 3;
-                  
+
               }
               // Ogni due lati, un quadrato tra loro e i loro corrispondenti nell'ultimo poligono
 
               // Se ho per esempio due quadrati e devo fare gli indici dei triangolini in mezzo:
               /*
               Precisione : 5
-              indici da mettere:   
+              indici da mettere:
               9,8,4,    4,3,8,    8,7,3,    3,2,7,    7,6,2,    2,1,6,    6,9,1,    1,4,9
               9,8,4,    8,7,3,    7,6,2,    6,9,1,    4,3,8,    3,2,7,    2,1,6     1,4,9
 
@@ -357,17 +358,30 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
               4---------3                             9---------8
 
               */
-              var temp = ind; // Mi salvo dov'era ind prima delle modifiche di questo ciclo
-              for( var j = 0; j < precisioneC ; j++ ){
-                console.log("j = ", j);
-                indices[ind] = indices[temp];
-                indices[ind+1] = indices[temp-1];
-                indices[ind+2] = indices[temp-2];
-                ind = ind + 3;
-                tempInd2 = tempInd2 + 1;
-                //console.log("indici:", indices);
-            }
-            indices[ind-1] = tempInd + 1;
+
+              tempInd = tempInd2 + 1;
+              tempInd2 = tempInd2 - precisioneC;
+              var temp = tempInd; // Mi salvo dov'era ind prima delle modifiche di questo ciclo
+              var temp2 = tempInd2 + 1;
+              console.log("tempInd", tempInd);
+              for( var j = 0; j < precisioneC; j++ ){
+                  //console.log("j = ", j);
+                  indices[ind] = tempInd;
+                  indices[ind+1] = tempInd+1;
+                  indices[ind+2] = tempInd2+1;
+
+                  indices[ind+3] = tempInd+1;
+                  indices[ind+4] = tempInd2+1;
+                  indices[ind+5] = tempInd2+2;
+
+                  ind = ind + 6;
+                  tempInd = tempInd + 1;
+                  tempInd2 = tempInd2 + 1;
+              }
+              indices[ind-5] = temp;
+              indices[ind-3] = temp;
+              indices[ind-2] = tempInd2;
+              indices[ind-1] = temp2;
           }
       }else{
           //console.log("count = ", count);
