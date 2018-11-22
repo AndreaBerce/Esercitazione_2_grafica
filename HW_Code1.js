@@ -94,8 +94,9 @@ function main() {
     refreshhh();
     console.log(colore);
   });
-  // Funzione che aggiorna il colore da usare nell'array g_colors
-  function changeColor(){
+
+  // Funzione di refresh. Ridisegna la figura corrente, aggiornando il colore.
+  function refreshhh(){
     g_colors.pop();
     g_colors.pop();
     g_colors.pop();
@@ -103,17 +104,11 @@ function main() {
     g_colors.push(colore.color0[0]/255);
     g_colors.push(colore.color0[1]/255);
     g_colors.push(colore.color0[2]/255);
-  }
-  // Funzione di refresh. Ridisegna la figura corrente, aggiornando il colore.
-  function refreshhh(){
-    changeColor();
-    //return n = initVertexBuffers(gl);
     return n = genericHedron(gl, centri, dimensioni, precisioneC);
   }
 
 
   //
-  //var n = initVertexBuffers(gl);
   var n = genericHedron(gl, centri, dimensioni, precisioneC);
   if (n < 0) {
     console.log('Failed to set the vertex information');
@@ -132,10 +127,6 @@ function main() {
     		geometria.torus = false;
 	   }
 
-     changeColor();
-     //n = initVertexBuffers(gl);
-     //var raggio = Math.sqrt(2);
-     //n = genericHedron(gl, [0,1,0,1,0,-1,0,-1], [0,raggio,raggio,0], 4);
      raggio = Math.sqrt(2);
      centri = new Float32Array([0,1,0,1,0,-1,0,-1]);
      dimensioni = new Float32Array([0,raggio,raggio,0]);
@@ -159,8 +150,6 @@ function main() {
     		geometria.torus = false;
 	   }
 
-
-     changeColor();
      //n = genericHedron(gl, [0,0,0,1], [1,0], 3);
      //n = genericHedron(gl, [0,1,0,-1,0,-1], [0,1,0], 64);
      centri = new Float32Array([0,1,0,-1,0,-1]);
@@ -186,7 +175,6 @@ function main() {
     		geometria.torus = false;
 	   }
 
-     changeColor();
      //n = initVertexBuffers(gl);
      //n = genericHedron(gl, [0,1,0,1,0,-1,0,-1], [0,1,1,0], 64);
      centri = new Float32Array([0,1,0,1,0,-1,0,-1]);
@@ -211,8 +199,11 @@ function main() {
     		geometria.torus = false;
 	   }
 
-     changeColor();
      //n = initVertexBuffers(gl);
+     centri = new Float32Array([0,1,0,1,0,-1,0,-1]);
+     dimensioni = new Float32Array([0,1,1,0]);
+     precisioneC = 64;
+
      n = genericHedron(gl, [0,1, 0,0.75, 0,0.5, 0,0, 0,-0.5, 0,-0.75, 0,-1], [0, 0.35, 0.75, 1, 0.75, 0.35, 0], 4);
 
 	   // Iterate over all controllers
@@ -231,7 +222,6 @@ function main() {
     		geometria.torus = value;
 	   }
 
-     changeColor();
      n = initVertexBuffers(gl);
 
 	   // Iterate over all controllers
