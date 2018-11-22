@@ -199,21 +199,20 @@ function main() {
     		geometria.torus = false;
 	   }
 
-     var nCentri = 50;
-     centri = new Float32Array(nCentri*2);
-     dimensioni = new Float32Array(nCentri);
+     precisioneC = 50;
+     centri = new Float32Array(precisioneC*2);
+     dimensioni = new Float32Array(precisioneC);
      raggio = 1;
-     precisioneC = 50;//55
      var angolo = Math.PI / 2;
-     for(var i = 0; i < nCentri; i++){
-        centri[i*2] = 0;
+     for(var i = 0; i < precisioneC; i++){
+        centri[i*2] = 1;                                // x
         centri[i*2+1] = raggio * Math.sin(angolo);      // y
         dimensioni[i] = raggio * Math.cos(angolo);
-        angolo = angolo - ( Math.PI / (nCentri - 1) );
+        angolo = angolo - ( Math.PI / (precisioneC - 1) );
      }
      dimensioni[0] = 0;
-     dimensioni[nCentri-1] = 0;
-     console.log("numero centri = ", nCentri);
+     dimensioni[precisioneC-1] = 0;
+     // console.log("numero centri = ", nCentri);
      console.log("centri:", centri);
      console.log("dimensioni:", dimensioni);
 
@@ -328,7 +327,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
               for(var j = 0; j < precisioneC; j++){
                   //console.log("j = ", j);
 
-                  vertices[count] = distanza[i] * Math.cos(angolo);        // x
+                  vertices[count] = centri[i*2] + distanza[i] * Math.cos(angolo);        // x
                   vertices[count+1] = centri[i*2 + 1];                     // y
                   vertices[count+2] =  distanza[i] * Math.sin(angolo);     // Z
 
@@ -360,7 +359,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                   // vertices
                   //console.log("j = ", j);
 
-                  vertices[count] = distanza[i] * Math.cos(angolo);        // x
+                  vertices[count] = centri[i*2] + distanza[i] * Math.cos(angolo);        // x
                   vertices[count+1] = centri[i*2 + 1];                     // y
                   vertices[count+2] =  distanza[i] * Math.sin(angolo);     // Z
 
@@ -454,7 +453,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           }
       }
   }
-  // console.log("vertici:", vertices);
+  console.log("vertici:", vertices);
   // console.log("indici:", indices);
   // console.log("colore:", colors);
   //console.log("count = ", count);
