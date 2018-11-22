@@ -126,7 +126,7 @@ function main() {
   // creo una GUI con dat.gui
   var gui = new dat.GUI();
   // checkbox geometry
-  var materiali = {brass:true,emerald:false,bronze:false,jade:false,gold:false};
+  var materiali = {brass:true,emerald:false,bronze:false,jade:false,gold:false,obsidian:false,pearl:false,ruby:false,turquoise:false,chrome:false,copper:false,silver:false};
   //
   gui.add(materiali,'brass').onFinishChange(function(value) {
      // Fires when a controller loses focus.
@@ -248,6 +248,183 @@ function main() {
         gui.__controllers[i].updateDisplay();
      }
   });
+
+  gui.add(materiali,'obsidian').onFinishChange(function(value) {
+     // Fires when a controller loses focus.
+	   if(value == true){
+    		for(var i in materiali){
+    			   materiali[i]=false;
+        }
+    		materiali.obsidian=true;
+    		console.log("obsidian");
+	   }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.05375, 0.05, 0.06625);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 0.18275, 0.17, 0.22525);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.332741, 0.328634, 0.346435);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.3*128);
+
+	   // Iterate over all controllers
+     for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+     }
+  });
+
+  gui.add(materiali,'pearl').onFinishChange(function(value) {
+     // Fires when a controller loses focus.
+	   if(value == true){
+    		for(var i in materiali){
+    			   materiali[i]=false;
+        }
+    		materiali.pearl=true;
+    		console.log("pearl");
+	   }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.25, 0.20725, 0.20725);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 1, 0.829, 0.829);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.296648, 0.296648, 0.296648);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.088*128);
+
+	   // Iterate over all controllers
+     for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+     }
+  });
+
+  gui.add(materiali,'ruby').onFinishChange(function(value) {
+     // Fires when a controller loses focus.
+	   if(value == true){
+    		for(var i in materiali){
+    			   materiali[i]=false;
+        }
+    		materiali.ruby=true;
+    		console.log("ruby");
+	   }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.1745, 0.01175, 0.01175);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 0.61424, 0.04136, 0.04136);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.727811, 0.626959, 0.626959);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.6*128);
+
+	   // Iterate over all controllers
+     for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+     }
+  });
+
+  gui.add(materiali,'turquoise').onFinishChange(function(value) {
+     // Fires when a controller loses focus.
+	   if(value == true){
+    		for(var i in materiali){
+    			   materiali[i]=false;
+        }
+    		materiali.turquoise=true;
+    		console.log("turquoise");
+	   }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.1, 0.18725, 0.1745);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 0.396, 0.74151, 0.69102);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.297254, 0.30829, 0.306678);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.1*128);
+
+	   // Iterate over all controllers
+     for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+     }
+  });
+
+  gui.add(materiali,'chrome').onFinishChange(function(value) {
+     // Fires when a controller loses focus.
+	   if(value == true){
+    		for(var i in materiali){
+    			   materiali[i]=false;
+        }
+    		materiali.chrome=true;
+    		console.log("chrome");
+	   }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.25, 0.25, 0.25);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 0.4, 0.4, 0.4);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.774597, 0.774597, 0.774597);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.6*128);
+
+	   // Iterate over all controllers
+     for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+     }
+  });
+
+  gui.add(materiali,'copper').onFinishChange(function(value) {
+     // Fires when a controller loses focus.
+	   if(value == true){
+    		for(var i in materiali){
+    			   materiali[i]=false;
+        }
+    		materiali.copper=true;
+    		console.log("copper");
+	   }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.19125, 0.0735, 0.0225);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 0.7038, 0.27048, 0.0828);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.256777, 0.137622, 0.086014);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.1*128);
+
+	   // Iterate over all controllers
+     for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+     }
+  });
+
+  gui.add(materiali,'silver').onFinishChange(function(value) {
+     // Fires when a controller loses focus.
+	   if(value == true){
+    		for(var i in materiali){
+    			   materiali[i]=false;
+        }
+    		materiali.silver=true;
+    		console.log("silver");
+	   }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.19225, 0.19225, 0.19225);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 0.50754, 0.50754, 0.50754);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.508273, 0.508273, 0.508273);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.4*128);
+
+	   // Iterate over all controllers
+     for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+     }
+  });
+
+
   //*********************************************************************************
 
   var currentAngle = 0.0;           // Current rotation angle
