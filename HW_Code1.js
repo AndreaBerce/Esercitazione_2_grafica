@@ -124,8 +124,8 @@ function main() {
 
      changeColor();
      //n = initVertexBuffers(gl);
-     var raggio = Math.tan(Math.PI/4);
-     n = genericHedron(gl, [0,1,0,1,0,-1,0,-1], [0,1,1,0], 4);
+     var raggio = Math.sqrt(2);
+     n = genericHedron(gl, [0,1,0,1,0,-1,0,-1], [0,raggio,raggio,0], 4);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
@@ -187,7 +187,7 @@ function main() {
 
      changeColor();
      //n = initVertexBuffers(gl);
-     n = genericHedron(gl, [0,1, 0,0.75, 0,0.5, 0,0, 0,-0.5, 0,-0.75, 0,-1], [0, 0.25, 0.5, 1, 0.5, 0.25, 0], 64);
+     n = genericHedron(gl, [0,1, 0,0.75, 0,0.5, 0,0, 0,-0.5, 0,-0.75, 0,-1], [0, 0.35, 0.75, 1, 0.75, 0.35, 0], 4);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
