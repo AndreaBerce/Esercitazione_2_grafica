@@ -325,9 +325,6 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                   colors.push(g_colors[0]);
                   colors.push(g_colors[1]);
                   colors.push(g_colors[2]);
-                  //colors[count*3 + 2] = 1 ;
-
-                  
 
               }
               
@@ -408,9 +405,13 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           vertices.push(0);
 
           //colors[count] = g_colors[0];
-          colors.push(1);
-          colors.push(1);
-          colors.push(1);
+          colors[0] = 1;
+          colors[1] = 1;
+          colors[2] = 1;
+          colors[colors.length-1] = 1;
+          colors[colors.length -2] = 1;
+          colors[colors.length -3] = 1;
+          
           
           if( i != 0 ){
               
@@ -559,6 +560,6 @@ function animate(angle) {
     var elapsed = now - g_last;
     g_last = now;
     // Update the current rotation angle (adjusted by the elapsed time)
-    var newAngle = angle + (ANGLE_STEP * elapsed) / 1000.0;
+    var newAngle = angle + (ANGLE_STEP * elapsed) / 500.0;
     return newAngle %= 360;
 }
