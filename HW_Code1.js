@@ -128,8 +128,8 @@ function main() {
 	   }
 
      raggio = Math.sqrt(2);
-     centri = new Float32Array([0,1,0,1,0,-1,0,-1]);
-     dimensioni = new Float32Array([0,raggio,raggio,0]);
+     centri = new Float32Array([0,1, 0,1, 0,-1, 0,-1]);
+     dimensioni = new Float32Array([0, raggio, raggio, 0]);
      precisioneC = 4;
 
      n = genericHedron(gl, centri, dimensioni, precisioneC);
@@ -152,8 +152,8 @@ function main() {
 
      //n = genericHedron(gl, [0,0,0,1], [1,0], 3);
      //n = genericHedron(gl, [0,1,0,-1,0,-1], [0,1,0], 64);
-     centri = new Float32Array([0,1,0,-1,0,-1]);
-     dimensioni = new Float32Array([0,1,0]);
+     centri = new Float32Array([0,1, 0,-1, 0,-1]);
+     dimensioni = new Float32Array([0, 1, 0]);
      precisioneC = 64;
 
      n = genericHedron(gl, centri, dimensioni, precisioneC);
@@ -177,8 +177,8 @@ function main() {
 
      //n = initVertexBuffers(gl);
      //n = genericHedron(gl, [0,1,0,1,0,-1,0,-1], [0,1,1,0], 64);
-     centri = new Float32Array([0,1,0,1,0,-1,0,-1]);
-     dimensioni = new Float32Array([0,1,1,0]);
+     centri = new Float32Array([0,1, 0,1, 0,-1, 0,-1]);
+     dimensioni = new Float32Array([0, 1, 1, 0]);
      precisioneC = 64;
 
      n = genericHedron(gl, centri, dimensioni, precisioneC);
@@ -199,12 +199,25 @@ function main() {
     		geometria.torus = false;
 	   }
 
-     //n = initVertexBuffers(gl);
-     centri = new Float32Array([0,1,0,1,0,-1,0,-1]);
-     dimensioni = new Float32Array([0,1,1,0]);
-     precisioneC = 64;
+     var nCentri = 50;
+     centri = new Float32Array(nCentri*2);
+     dimensioni = new Float32Array(nCentri);
+     raggio = 1;
+     precisioneC = 50;//55
+     var angolo = Math.PI / 2;
+     for(var i = 0; i < nCentri; i++){
+        centri[i*2] = 0;
+        centri[i*2+1] = raggio * Math.sin(angolo);      // y
+        dimensioni[i] = raggio * Math.cos(angolo);
+        angolo = angolo - ( Math.PI / (nCentri - 1) );
+     }
+     dimensioni[0] = 0;
+     dimensioni[nCentri-1] = 0;
+     console.log("numero centri = ", nCentri);
+     console.log("centri:", centri);
+     console.log("dimensioni:", dimensioni);
 
-     n = genericHedron(gl, [0,1, 0,0.75, 0,0.5, 0,0, 0,-0.5, 0,-0.75, 0,-1], [0, 0.35, 0.75, 1, 0.75, 0.35, 0], 4);
+     n = genericHedron(gl, centri, dimensioni, precisioneC);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
@@ -251,7 +264,7 @@ function main() {
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
       // Draw the cube
-      gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
+      gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
 
       requestAnimationFrame(tick, canvas); // Request that the browser ?calls tick
   };
@@ -281,11 +294,11 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           }
           precedentePunto=true;
       }
-      console.log(nv);
+      //console.log(nv);
   }
   nv = nv * 3;
-  console.log("nv = ", nv);
-  console.log("ni = ", ni);
+  //console.log("nv = ", nv);
+  //console.log("ni = ", ni);
 
   // creazione del vettore dei vertici
   var vertices = new Float32Array(nv);
@@ -299,7 +312,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   }
 
   // Indices of the vertices
-  var indices = new Uint8Array(ni);
+  var indices = new Uint16Array(ni);
 
   var count = 0;
   var angolo = Math.PI / 4;
@@ -382,7 +395,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
               tempInd2 = tempInd2 - precisioneC;
               var temp = tempInd; // Mi salvo dov'era ind prima delle modifiche di questo ciclo
               var temp2 = tempInd2 + 1;
-              console.log("tempInd", tempInd);
+              //console.log("tempInd", tempInd);
               for( var j = 0; j < precisioneC; j++ ){
                   //console.log("j = ", j);
                   indices[ind] = tempInd;
@@ -417,14 +430,18 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           //colors[count + 2] = g_colors[2];
           colors[count + 2] = 1;
           //console.log("colore:", colors);
-          console.log("i = ", i);
-          console.log("centri: ", centri);
-          console.log("punto: ", vertices[count], vertices[count+1], vertices[count+2]);
+          //console.log("i = ", i);
+          //console.log("centri: ", centri);
+          //console.log("punto: ", vertices[count], vertices[count+1], vertices[count+2]);
           count = count + 3;
           if( i != 0 ){
-              console.log("tempInd2 = ", tempInd2);
+              //console.log("tempInd:", tempInd);
+              //console.log("tempInd2 = ", tempInd2);
               tempInd = tempInd2 + 1;
               tempInd2 = tempInd2 - precisioneC + 1;
+              //console.log("modifica");
+              //console.log("tempInd:", tempInd);
+              //console.log("tempInd2 = ", tempInd2);
               for( var j = 0; j < precisioneC; j++ ){
                   //console.log("j = ", j);
                   indices[ind] = tempInd;
@@ -437,30 +454,11 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           }
       }
   }
-  console.log("vertici:", vertices);
-  console.log("indici:", indices);
-  console.log("colore:", colors);
+  // console.log("vertici:", vertices);
+  // console.log("indici:", indices);
+  // console.log("colore:", colors);
+  //console.log("count = ", count);
   //console.log("n indici:", indices.length);
-/*
-  //Per ogni vertice:
-  for(var i=1; i < nv+1; i++){
-      // Calcolamo le coordinate del vertice corrente
-      vertices[i*3] = raggio * Math.cos(angolo);        // x
-      vertices[i*3 + 1] = raggio * Math.sin(angolo);    // y
-      vertices[i*3 + 2] = 0.0 ;                         // z
-      // Andiamo al prossimo vertice (per il prossimo ciclo)
-      angolo = angolo + ( 2 * Math.PI/nVertici );
-      // Riempie il vettore dei colori
-      colors[i*3] = g_colors[0];
-      colors[i*3 + 1] = g_colors[1];
-      colors[i*3 + 2] = g_colors[2];
-      // Settiamo gli indici del triangolo corrente
-      indices[i*3] = 0;
-      indices[i*3 + 1]=i+1;
-      indices[i*3 + 2]=i+2;
-  }
-*/
-
 
 
   // Write the vertex property to buffers (coordinates, colors and normals)
