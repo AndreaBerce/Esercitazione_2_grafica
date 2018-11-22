@@ -80,6 +80,14 @@ function main() {
   g_colors.push(colore.color0[1]/255);
   g_colors.push(colore.color0[2]/255);
 
+
+  var raggio = Math.sqrt(2);
+
+  var centri = new Float32Array([0,1,0,1,0,-1,0,-1]);
+  var dimensioni = new Float32Array([0,raggio,raggio,0]);
+  var precisioneC = 4;
+
+
   //
   gui.addColor(colore,'color0').onFinishChange(function(value) {
 	  console.log(value);
@@ -99,12 +107,14 @@ function main() {
   // Funzione di refresh. Ridisegna la figura corrente, aggiornando il colore.
   function refreshhh(){
     changeColor();
-    return n = initVertexBuffers(gl);
+    //return n = initVertexBuffers(gl);
+    return n = genericHedron(gl, centri, dimensioni, precisioneC);
   }
 
 
   //
-  var n = initVertexBuffers(gl);
+  //var n = initVertexBuffers(gl);
+  var n = genericHedron(gl, centri, dimensioni, precisioneC);
   if (n < 0) {
     console.log('Failed to set the vertex information');
     return;
@@ -124,8 +134,14 @@ function main() {
 
      changeColor();
      //n = initVertexBuffers(gl);
-     var raggio = Math.sqrt(2);
-     n = genericHedron(gl, [0,1,0,1,0,-1,0,-1], [0,raggio,raggio,0], 4);
+     //var raggio = Math.sqrt(2);
+     //n = genericHedron(gl, [0,1,0,1,0,-1,0,-1], [0,raggio,raggio,0], 4);
+     raggio = Math.sqrt(2);
+     centri = new Float32Array([0,1,0,1,0,-1,0,-1]);
+     dimensioni = new Float32Array([0,raggio,raggio,0]);
+     precisioneC = 4;
+
+     n = genericHedron(gl, centri, dimensioni, precisioneC);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
@@ -146,7 +162,12 @@ function main() {
 
      changeColor();
      //n = genericHedron(gl, [0,0,0,1], [1,0], 3);
-     n = genericHedron(gl, [0,1,0,-1,0,-1], [0,1,0], 64);
+     //n = genericHedron(gl, [0,1,0,-1,0,-1], [0,1,0], 64);
+     centri = new Float32Array([0,1,0,-1,0,-1]);
+     dimensioni = new Float32Array([0,1,0]);
+     precisioneC = 64;
+
+     n = genericHedron(gl, centri, dimensioni, precisioneC);
 
 
 	   // Iterate over all controllers
@@ -167,7 +188,12 @@ function main() {
 
      changeColor();
      //n = initVertexBuffers(gl);
-     n = genericHedron(gl, [0,1,0,1,0,-1,0,-1], [0,1,1,0], 64);
+     //n = genericHedron(gl, [0,1,0,1,0,-1,0,-1], [0,1,1,0], 64);
+     centri = new Float32Array([0,1,0,1,0,-1,0,-1]);
+     dimensioni = new Float32Array([0,1,1,0]);
+     precisioneC = 64;
+
+     n = genericHedron(gl, centri, dimensioni, precisioneC);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
