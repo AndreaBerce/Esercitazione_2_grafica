@@ -1,6 +1,6 @@
-// Codice1.js 
+// Codice1.js
 // implementazione modello di blinn phong
-// GDD - 2017 
+// GDD - 2017
 // Vertex shader program
 var VSHADER_SOURCE =
   'attribute vec4 a_Position;\n' +
@@ -23,8 +23,8 @@ var VSHADER_SOURCE =
   '  vec3 normal = normalize(vec3(u_NormalMatrix * a_Normal));\n' +
      // Calculate world coordinate of vertex
   '  vec4 vertexPosition = u_ModelMatrix * a_Position;\n' +
-  '  float d = length(u_LightPosition - vec3(vertexPosition));\n' + 
-  '  float atten = 1.0/(0.01 * d*d);\n' + 
+  '  float d = length(u_LightPosition - vec3(vertexPosition));\n' +
+  '  float atten = 1.0/(0.01 * d*d);\n' +
      // Calculate the light direction and make it 1.0 in length
   '  vec3 lightDirection = normalize(u_LightPosition - vec3(vertexPosition));\n' +
      // The dot product of the light direction and the normal
@@ -33,15 +33,15 @@ var VSHADER_SOURCE =
   '  vec3 diffuse = u_LightColor * u_DiffuseMat * nDotL;\n' +
      // Calculate the color due to ambient reflection
   '  vec3 ambient = u_AmbientLight * u_AmbientMat;\n' +
-  '  vec3 specular = vec3(0.0,0.0,0.0);\n'            + 
+  '  vec3 specular = vec3(0.0,0.0,0.0);\n'            +
   '  if(nDotL > 0.0) {\n'                             +
        // Calculate specular component
-  '       vec3 h = normalize(normalize(u_CameraPos - vec3(vertexPosition)) + lightDirection);\n' + 	
-  '       float hDotn  = max(dot(h, normal), 0.0);\n' +  
+  '       vec3 h = normalize(normalize(u_CameraPos - vec3(vertexPosition)) + lightDirection);\n' +
+  '       float hDotn  = max(dot(h, normal), 0.0);\n' +
   '       specular = u_LightColor * u_SpecularMat * pow(hDotn,u_Shininess);\n' +
-  '  }\n'                                           + 
+  '  }\n'                                           +
      // Add the surface colors due to diffuse reflection and ambient reflection
-  '  v_Color = vec4(atten *(diffuse + specular)  + ambient, 1.0);\n' + 
+  '  v_Color = vec4(atten *(diffuse + specular)  + ambient, 1.0);\n' +
   '}\n';
 
 // Fragment shader program
@@ -94,31 +94,31 @@ function main() {
   var u_Shininess     = gl.getUniformLocation(gl.program, 'u_Shininess');
   var u_AmbientMat    = gl.getUniformLocation(gl.program, 'u_AmbientMat');
   var u_CameraPos     = gl.getUniformLocation(gl.program, 'u_CameraPos');
-  if (!u_ModelMatrix || !u_MvpMatrix   || !u_NormalMatrix || 
+  if (!u_ModelMatrix || !u_MvpMatrix   || !u_NormalMatrix ||
       !u_LightColor || !u_LightPosition　|| !u_AmbientLight ||
-	  !u_DiffuseMat  || !u_SpecularMat || !u_Shininess || !u_AmbientMat || !u_CameraPos) { 
+	  !u_DiffuseMat  || !u_SpecularMat || !u_Shininess || !u_AmbientMat || !u_CameraPos) {
     console.log('Failed to get the storage location');
     return;
   }
   // ******************************************************************************************
-  // Set the Specular and Diffuse light color 
+  // Set the Specular and Diffuse light color
   gl.uniform3f(u_LightColor, 1.0, 1.0, 1.0);
   // Set the light direction (in the world coordinate)
   gl.uniform3f(u_LightPosition, 1.0, 2.0, 12.0);
   // Set the ambient light
   gl.uniform3f(u_AmbientLight, 0.2, 0.2, 0.2);
-  
+
   // Set the ambient material
   gl.uniform3f(u_AmbientMat, 0.329412, 0.223529, 0.027451);
   // Set the diffuse material
-  gl.uniform3f(u_DiffuseMat, 0.780392, 0.780392, 0.113725);
+  gl.uniform3f(u_DiffuseMat, 0.780392, 0.568627, 0.113725);
   // Set the specular material
   gl.uniform3f(u_SpecularMat, 0.992157	, 0.941176, 0.807843);
 
    // Set the specular material
   gl.uniform1f(u_Shininess, 0.21794872*128);
-  
-   var cameraPos = [1,3,8];          // camera position 
+
+   var cameraPos = [1,3,8];          // camera position
   // Set the camera position
   gl.uniform3f(u_CameraPos, cameraPos[0],cameraPos[1],cameraPos[2]);
   //********************************************************************************************
@@ -129,79 +129,130 @@ function main() {
   var materiali = {brass:true,emerald:false,bronze:false,jade:false,gold:false};
   //
   gui.add(materiali,'brass').onFinishChange(function(value) {
-    // Fires when a controller loses focus.
+     // Fires when a controller loses focus.
 	   if(value == true){
-		for(var i in materiali)
-			materiali[i]=false;
-		materiali.brass=true;
-		console.log("brass");
-	   }
-	   // Iterate over all controllers
-       for (var i in gui.__controllers) {
-          gui.__controllers[i].updateDisplay();
-       }
-   });
+    		for(var i in materiali){
+    		    materiali[i]=false;
+        }
+    		materiali.brass=true;
+    		console.log("brass");
+  	 }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.329412, 0.223529, 0.027451);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 0.780392, 0.568627, 0.113725);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.992157	, 0.941176, 0.807843);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.21794872*128);
+
+     // Iterate over all controllers
+     for (var i in gui.__controllers) {
+         gui.__controllers[i].updateDisplay();
+     }
+  });
   gui.add(materiali,'emerald').onFinishChange(function(value) {
-    // Fires when a controller loses focus.
-       // Fires when a controller loses focus.
+     // Fires when a controller loses focus.
 	   if(value == true){
-		for(var i in materiali)
-			materiali[i]=false;
-		materiali.emerald=true;
-		console.log("emerald");
+    		for(var i in materiali){
+    			materiali[i]=false;
+        }
+    		materiali.emerald=true;
+    		console.log("emerald");
 	   }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.0215, 0.1745, 0.0215);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 0.07568, 0.61424, 0.07568);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.633, 0.727811, 0.633);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.6*128);
+
 	   // Iterate over all controllers
-       for (var i in gui.__controllers) {
-          gui.__controllers[i].updateDisplay();
-       }
-   });
+     for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+     }
+  });
   gui.add(materiali,'bronze').onFinishChange(function(value) {
-    // Fires when a controller loses focus.
-       // Fires when a controller loses focus.
+     // Fires when a controller loses focus.
 	   if(value == true){
-		for(var i in materiali)
-			materiali[i]=false;
-		materiali.bronze=true;
-		console.log("bronze");		   
+    		for(var i in materiali){
+    			   materiali[i]=false;
+        }
+    		materiali.bronze=true;
+    		console.log("bronze");
 	   }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.2125, 0.1275, 0.054);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 0.714, 0.4284, 0.18144);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.393548, 0.271906, 0.166721);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.2*128);
+
 	   // Iterate over all controllers
-       for (var i in gui.__controllers) {
-          gui.__controllers[i].updateDisplay();
-       }
-   });
+     for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+     }
+  });
   gui.add(materiali,'jade').onFinishChange(function(value) {
-    // Fires when a controller loses focus.
-       // Fires when a controller loses focus.
+     // Fires when a controller loses focus.
 	   if(value == true){
-		for(var i in materiali)
-			materiali[i]=false;
-		materiali.jade=true;
-		console.log("jade");		
+    		for(var i in materiali){
+    			   materiali[i]=false;
+        }
+    		materiali.jade=true;
+    		console.log("jade");
 	   }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.135, 0.2225, 0.1575);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 0.54, 0.89, 0.63);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.316228, 0.316228, 0.316228);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.1*128);
+
 	   // Iterate over all controllers
-       for (var i in gui.__controllers) {
-          gui.__controllers[i].updateDisplay();
-       }
-   });
+     for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+     }
+  });
   gui.add(materiali,'gold').onFinishChange(function(value) {
-    // Fires when a controller loses focus.
-       // Fires when a controller loses focus.
+     // Fires when a controller loses focus.
 	   if(value == true){
-		for(var i in materiali)
-			materiali[i]=false;
-		materiali.gold=true;
-		console.log("gold");
+    		for(var i in materiali){
+    			   materiali[i]=false;
+        }
+    		materiali.gold=true;
+    		console.log("gold");
 	   }
+
+     // Set the ambient material
+     gl.uniform3f(u_AmbientMat, 0.24725, 0.1995, 0.0745);
+     // Set the diffuse material
+     gl.uniform3f(u_DiffuseMat, 0.75164, 0.60648, 0.22648);
+     // Set the specular material
+     gl.uniform3f(u_SpecularMat, 0.628281, 0.555802, 0.366065);
+    // Set the specular material
+     gl.uniform1f(u_Shininess, 0.4*128);
+
 	   // Iterate over all controllers
-       for (var i in gui.__controllers) {
-          gui.__controllers[i].updateDisplay();
-       }
-   });
+     for (var i in gui.__controllers) {
+        gui.__controllers[i].updateDisplay();
+     }
+  });
   //*********************************************************************************
-  
+
   var currentAngle = 0.0;           // Current rotation angle
-  var vpMatrix = new Matrix4();   // View projection matrix 
-  
+  var vpMatrix = new Matrix4();   // View projection matrix
+
   // Calculate the view projection matrix
   vpMatrix.setPerspective(30, canvas.width/canvas.height, 1, 100);
   vpMatrix.lookAt(cameraPos[0],cameraPos[1],cameraPos[2], 0, 0, 0, 0, 1, 0);
@@ -209,10 +260,10 @@ function main() {
   var modelMatrix = new Matrix4();  // Model matrix
   var mvpMatrix = new Matrix4(); 　  // Model view projection matrix
   var normalMatrix = new Matrix4(); // Transformation matrix for normals
- 
+
   var tick = function() {
 	currentAngle = animate(currentAngle);  // Update the rotation angle
- 	
+
 	// Calculate the model matrix
 	modelMatrix.setRotate(currentAngle, 1, 1, 0); // Rotate around the y-axis
 
@@ -234,7 +285,7 @@ function main() {
 
 	// Draw the cube(Note that the 3rd argument is the gl.UNSIGNED_SHORT)
 	gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
-	  
+
 	requestAnimationFrame(tick, canvas); // Request that the browser ?calls tick
   };
   tick();
@@ -284,7 +335,7 @@ function initVertexBuffersCube(gl) {
   // In order to make it intelligible, another buffer is prepared separately
   if (!initArrayBuffer(gl, 'a_Position', new Float32Array(positions), gl.FLOAT, 3)) return -1;
   if (!initArrayBuffer(gl, 'a_Normal'  , new Float32Array(normals)  , gl.FLOAT, 3)) return -1;
-  
+
   // Unbind the buffer object
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
