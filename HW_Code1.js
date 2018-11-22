@@ -266,6 +266,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   // calcolo numero di vertici della figura
   var nv = 0; // numero vertici
   var ni = 0; // numero indici
+  
   var precedentePunto=true;
   for(var i = 0; i < (centri.length / 2); i++){
       if(distanza[i] > 0){
@@ -288,14 +289,16 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   nv = nv * 3;
 
   // creazione del vettore dei vertici
-  var vertices = new Float32Array(nv);
+  var vertices = [];
+  //var vertices = new Float32Array(nv);
 
   //
-  var colors = new Float32Array(nv);
-  for(var i=0; i < 24; i++){
-    colors[i*3] = g_colors[0];
-    colors[i*3+1] = g_colors[1];
-    colors[i*3+2] = g_colors[2];
+  var colors = [];
+  //var colors = new Float32Array(nv);
+  for(var i=0; i < nv/3; i++){
+    colors.push(g_colors[0]);
+    colors.push(g_colors[1]);
+    colors.push(g_colors[2]);
   }
 
   // Indices of the vertices
@@ -313,18 +316,18 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           if( distanza[i-1] == 0 ){ // Se il precedente era un punto con distanza 0
               for(var j = 0; j < precisioneC; j++){
 
-                  vertices[count] = centri[i*2] + distanza[i] * Math.cos(angolo);        // x
-                  vertices[count+1] = centri[i*2 + 1];                     // y
-                  vertices[count+2] =  distanza[i] * Math.sin(angolo);     // Z
+                  vertices.push(centri[i*2] + distanza[i] * Math.cos(angolo));        // x
+                  vertices.push(centri[i*2 + 1]);                     // y
+                  vertices.push(distanza[i] * Math.sin(angolo));     // Z
 
                   angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-                  colors[count] = g_colors[0] ;
-                  colors[count + 1] = g_colors[1] ;
-                  colors[count + 2] = g_colors[2] ;
+                  colors.push(g_colors[0]);
+                  colors.push(g_colors[1]);
+                  colors.push(g_colors[2]);
                   //colors[count*3 + 2] = 1 ;
 
-                  count = count + 3;
+                  
 
               }
               
@@ -343,17 +346,17 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
               //In ogni caso, calcolare i punti del poligono
               for(var j = 0; j < precisioneC; j++){
 
-                  vertices[count] = centri[i*2] + distanza[i] * Math.cos(angolo);        // x
-                  vertices[count+1] = centri[i*2 + 1];                     // y
-                  vertices[count+2] =  distanza[i] * Math.sin(angolo);     // Z
+                  vertices.push(centri[i*2] + distanza[i] * Math.cos(angolo));        // x
+                  vertices.push(centri[i*2 + 1]);                     // y
+                  vertices.push(distanza[i] * Math.sin(angolo));     // Z
 
                   angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-                  colors[count] = g_colors[0] ;
-                  colors[count + 1] = g_colors[1] ;
-                  colors[count + 2] = g_colors[2] ;
+                  colors.push(g_colors[0]);
+                  colors.push(g_colors[1]);
+                  colors.push(g_colors[2]);
 
-                  count = count + 3;
+
 
               }
               // Ogni due lati, un quadrato tra loro e i loro corrispondenti nell'ultimo poligono
@@ -400,18 +403,15 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           }
       }else{
           
-          vertices[count] = centri[i*2];
-          vertices[count + 1] = centri[i*2 + 1];
-          vertices[count + 2] = 0;
+          vertices.push(centri[i*2]);
+          vertices.push(centri[i*2 + 1]);
+          vertices.push(0);
 
           //colors[count] = g_colors[0];
-          colors[count] = 1;
-          //colors[count + 1] = g_colors[1];
-          colors[count + 1] = 1;
-          //colors[count + 2] = g_colors[2];
-          colors[count + 2] = 1;
+          colors.push(1);
+          colors.push(1);
+          colors.push(1);
           
-          count = count + 3;
           if( i != 0 ){
               
               tempInd = tempInd2 + 1;
@@ -431,9 +431,12 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   }
   console.log("vertici:", vertices);
 
+  
+
+
   // Write the vertex property to buffers (coordinates, colors and normals)
-  if (!initArrayBuffer(gl, 'a_Position', vertices,       3, gl.FLOAT)) return -1;
-  if (!initArrayBuffer(gl, 'a_Color',    colors,  3, gl.FLOAT)) return -1;
+  if (!initArrayBuffer(gl, 'a_Position', new Float32Array(vertices),       3, gl.FLOAT)) return -1;
+  if (!initArrayBuffer(gl, 'a_Color',    new Float32Array(colors),  3, gl.FLOAT)) return -1;
 
   // Unbind the buffer object
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -542,8 +545,6 @@ function initArrayBuffer(gl, attribute, data, num, type) {
     gl.enableVertexAttribArray(a_attribute);
     return true;
 }
-
-
 
 
 // Rotation angle (degrees/second)
