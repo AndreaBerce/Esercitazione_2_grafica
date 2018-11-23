@@ -72,7 +72,37 @@ function main() {
   }
 
   // Set the vertex coordinates, the color and the normal
-  var n = initVertexBuffersCube(gl);
+  //var n = initVertexBuffersCube(gl);
+
+  var raggio = Math.sqrt(2);
+  var centri = new Float32Array([0,1, 0,1, 0,-1, 0,-1]);
+  var dimensioni = new Float32Array([0, raggio, raggio, 0]);
+  var precisioneC = 4;
+
+  var n = genericHedron(gl, centri, dimensioni, precisioneC);
+
+
+
+  precisioneC = 100;
+  centri = new Float32Array(precisioneC*2);
+  dimensioni = new Float32Array(precisioneC);
+
+  raggio = 1;
+  var angolo = Math.PI / 2;
+  for(var i = 0; i < precisioneC; i++){
+     centri[i*2] = 0;                                // x
+     centri[i*2+1] = raggio * Math.sin(angolo);      // y
+     dimensioni[i] = raggio * Math.cos(angolo);
+     angolo = angolo - ( Math.PI / (precisioneC - 1) );
+  }
+  dimensioni[0] = 0;
+  dimensioni[precisioneC-1] = 0;
+
+  n = genericHedron(gl, centri, dimensioni, precisioneC);
+
+
+
+
   if (n < 0) {
     console.log('Failed to set the vertex information');
     return;
@@ -248,7 +278,6 @@ function main() {
         gui.__controllers[i].updateDisplay();
      }
   });
-
   gui.add(materiali,'obsidian').onFinishChange(function(value) {
      // Fires when a controller loses focus.
 	   if(value == true){
@@ -273,7 +302,6 @@ function main() {
         gui.__controllers[i].updateDisplay();
      }
   });
-
   gui.add(materiali,'pearl').onFinishChange(function(value) {
      // Fires when a controller loses focus.
 	   if(value == true){
@@ -298,7 +326,6 @@ function main() {
         gui.__controllers[i].updateDisplay();
      }
   });
-
   gui.add(materiali,'ruby').onFinishChange(function(value) {
      // Fires when a controller loses focus.
 	   if(value == true){
@@ -323,7 +350,6 @@ function main() {
         gui.__controllers[i].updateDisplay();
      }
   });
-
   gui.add(materiali,'turquoise').onFinishChange(function(value) {
      // Fires when a controller loses focus.
 	   if(value == true){
@@ -348,7 +374,6 @@ function main() {
         gui.__controllers[i].updateDisplay();
      }
   });
-
   gui.add(materiali,'chrome').onFinishChange(function(value) {
      // Fires when a controller loses focus.
 	   if(value == true){
@@ -373,7 +398,6 @@ function main() {
         gui.__controllers[i].updateDisplay();
      }
   });
-
   gui.add(materiali,'copper').onFinishChange(function(value) {
      // Fires when a controller loses focus.
 	   if(value == true){
@@ -398,7 +422,6 @@ function main() {
         gui.__controllers[i].updateDisplay();
      }
   });
-
   gui.add(materiali,'silver').onFinishChange(function(value) {
      // Fires when a controller loses focus.
 	   if(value == true){
@@ -439,34 +462,248 @@ function main() {
   var normalMatrix = new Matrix4(); // Transformation matrix for normals
 
   var tick = function() {
-	currentAngle = animate(currentAngle);  // Update the rotation angle
+    	currentAngle = animate(currentAngle);  // Update the rotation angle
 
-	// Calculate the model matrix
-	modelMatrix.setRotate(currentAngle, 1, 1, 0); // Rotate around the y-axis
+    	// Calculate the model matrix
+    	modelMatrix.setRotate(currentAngle, 1, 1, 0); // Rotate around the y-axis
 
-	// Pass the model matrix to u_ModelMatrix
-	gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    	// Pass the model matrix to u_ModelMatrix
+    	gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
 
-	mvpMatrix.set(vpMatrix).multiply(modelMatrix);
-	// Pass the model view projection matrix to u_MvpMatrix
-	gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
+    	mvpMatrix.set(vpMatrix).multiply(modelMatrix);
+    	// Pass the model view projection matrix to u_MvpMatrix
+    	gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
 
-	// Calculate the matrix to transform the normal based on the model matrix
-	normalMatrix.setInverseOf(modelMatrix);
-	normalMatrix.transpose();
-	// Pass the transformation matrix for normals to u_NormalMatrix
-	gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
+    	// Calculate the matrix to transform the normal based on the model matrix
+    	normalMatrix.setInverseOf(modelMatrix);
+    	normalMatrix.transpose();
+    	// Pass the transformation matrix for normals to u_NormalMatrix
+    	gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
 
-	// Clear color and depth buffer
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    	// Clear color and depth buffer
+    	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-	// Draw the cube(Note that the 3rd argument is the gl.UNSIGNED_SHORT)
-	gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
+    	// Draw the cube(Note that the 3rd argument is the gl.UNSIGNED_SHORT)
+    	gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
 
-	requestAnimationFrame(tick, canvas); // Request that the browser ?calls tick
+    	requestAnimationFrame(tick, canvas); // Request that the browser ?calls tick
   };
   tick();
 }
+
+
+
+function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri, distanza punti da centri, precisione cerchi
+  // calcolo numero di vertici della figura
+  var nv = 0; // numero vertici
+  var ni = 0; // numero indici
+
+  for( var i = 0; i < (centri.length / 2); i++ ){
+      if( distanza[i] > 0 ){
+          if( distanza[i-1] == 0 ){ // se prima c'era un punto
+              ni = ni + precisioneC * 3;  // ni = ni + nTriangoli * nVertitiTriangolo
+          }else{ // se prima c'era un poligolo
+              ni = ni + precisioneC * 6;  // ni = ni + nTriangoli * 2 * nVertitiTriangolo
+          }
+      }else{
+          if( i > 0 && distanza[i-1] != 0 ){ // se prima c'era un poligono
+              ni = ni + precisioneC * 3;  // ni = ni + nTriangoli * nVertitiTriangolo
+          }
+      }
+  }
+  nv = ni * 3;
+
+  // creazione del vettore dei vertici
+  var vertices = new Float32Array(nv);
+
+  // Indices of the vertices
+  var indices = new Uint16Array(ni);
+
+  var count = 0;
+  var angolo = Math.PI / 4;
+  var ind = 0;
+
+  for( var i = 0; i < (centri.length / 2); i++ ){
+      if( distanza[i] > 0 ){
+          if( distanza[i-1] == 0 ){ // se prima c'era un punto
+              for(var j = 0; j < precisioneC; j++){
+                  vertices[count] = centri[(i-1) * 2];                                    // x del punto
+                  vertices[count+1] = centri[(i-1) * 2 + 1];                              // y del punto
+                  vertices[count+2] = 0;
+
+                  vertices[count+3] = centri[i*2] + distanza[i] * Math.cos(angolo);       // x
+                  vertices[count+4] = centri[i*2 + 1];                                    // y
+                  vertices[count+5] = distanza[i] * Math.sin(angolo);                     // Z
+
+                  angolo = angolo + ( 2 * Math.PI/precisioneC );
+
+                  vertices[count+6] = centri[i*2] + distanza[i] * Math.cos(angolo);       // x
+                  vertices[count+7] = centri[i*2 + 1];                                    // y
+                  vertices[count+8] = distanza[i] * Math.sin(angolo);                     // Z
+
+                  indices[ind] = ind;
+                  indices[ind+1] = ind+1;
+                  indices[ind+2] = ind+2;
+
+                  count = count + 9;
+                  ind = ind + 3;
+              }
+          }else{ // se prima c'era un poligolo
+              //console.log("vertici:", vertices);
+              for( var j = 0; j < precisioneC; j++ ){
+                  //1
+                  vertices[count+6] = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo); // x
+                  vertices[count+7] = centri[(i-1)*2 + 1];                                // y
+                  vertices[count+8] = distanza[i-1] * Math.sin(angolo);                   // Z
+
+                  //5
+                  vertices[count] = centri[i*2] + distanza[i] * Math.cos(angolo);         // x
+                  vertices[count+1] = centri[i*2 + 1];                                    // y
+                  vertices[count+2] = distanza[i] * Math.sin(angolo);                     // Z
+
+                  angolo = angolo + ( 2 * Math.PI/precisioneC );
+
+                  //6
+                  vertices[count+3] = centri[i*2] + distanza[i] * Math.cos(angolo);       // x
+                  vertices[count+4] = centri[i*2 + 1];                                    // y
+                  vertices[count+5] = distanza[i] * Math.sin(angolo);                     // Z
+
+                  indices[ind] = ind;
+                  indices[ind+1] = ind+1;
+                  indices[ind+2] = ind+2;
+
+                  //1
+                  vertices[count+9] = vertices[count+6];
+                  vertices[count+10] = vertices[count+7];
+                  vertices[count+11] = vertices[count+8];
+
+                  //6
+                  vertices[count+12] = vertices[count+3];
+                  vertices[count+13] = vertices[count+4];
+                  vertices[count+14] = vertices[count+5];
+
+                  //2
+                  vertices[count+15] = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo);// x
+                  vertices[count+16] = centri[(i-1)*2 + 1];                               // y
+                  vertices[count+17] = distanza[i-1] * Math.sin(angolo);                  // Z
+
+                  indices[ind+3] = ind+3;
+                  indices[ind+4] = ind+4;
+                  indices[ind+5] = ind+5;
+                  ind = ind + 6;
+                  count = count + 18;
+              }
+          }
+      }else{
+          if( i > 0 && distanza[i-1] != 0 ){ // se prima c'era un poligono
+              //console.log("angolo = ", angolo);
+              for( var j = 0; j < precisioneC; j++ ){
+                  vertices[count+6] = centri[i * 2];                                      // x del punto
+                  vertices[count+7] = centri[i * 2 + 1];                                  // y del punto
+                  vertices[count+8] = 0;
+
+                  vertices[count+3] = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo); // x
+                  vertices[count+4] = centri[(i-1)*2 + 1];                                // y
+                  vertices[count+5] = distanza[i-1] * Math.sin(angolo);                   // Z
+
+                  angolo = angolo + ( 2 * Math.PI/precisioneC );
+
+                  vertices[count] = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo);   // x
+                  vertices[count+1] = centri[(i-1)*2 + 1];                                // y
+                  vertices[count+2] = distanza[i-1] * Math.sin(angolo);                   // Z
+
+                  // console.log("angolo = ", angolo);
+                  // console.log("valori: ", vertices[count], vertices[count+1], vertices[count+2], vertices[count+3], vertices[count+4], vertices[count+5], vertices[count+6], vertices[count+7], vertices[count+8]);
+
+                  indices[ind] = ind;
+                  indices[ind+1] = ind+1;
+                  indices[ind+2] = ind+2;
+                  count = count + 9;
+                  ind = ind + 3;
+                  // console.log("j = ", j);
+                  // console.log("count = ", count);
+              }
+          }
+      }
+      //console.log("vertici:", vertices);
+  }
+  //console.log("vertici:", vertices);
+  //console.log("indici:", indices);
+
+  // Indices of the vertices
+  var indices = new Uint16Array(ni);
+  for( var i = 0; i < ni; i++ ){
+      indices[i] = i;
+  }
+
+
+  var normals = new Float32Array(vertices.length);
+  var temp = new Float32Array(10);
+  count = 0;
+  for( var  i = 0; i < (indices.length / 3) ; i++){
+      // console.log("indici:", indices);
+      // console.log("indici considerati:", indices[i*3], indices[i*3+1], indices[i*3+2]);
+      // console.log(vertices[indices[i*3]*3], vertices[indices[i*3]*3 + 1], vertices[indices[i*3]*3 + 2]);
+      // console.log(vertices[indices[i*3+1]*3], vertices[indices[i*3+1]*3 + 1], vertices[indices[i*3+1]*3 + 2]);
+      // console.log(vertices[indices[i*3+2]*3], vertices[indices[i*3+2]*3 + 1], vertices[indices[i*3+2]*3 + 2]);
+
+      temp[0] = vertices[indices[i*3]*3] - vertices[indices[i*3+1]*3];
+      temp[1] = vertices[indices[i*3]*3 + 1] - vertices[indices[i*3+1]*3 + 1];
+      temp[2] = vertices[indices[i*3]*3 + 2] - vertices[indices[i*3+1]*3 + 2];
+
+      temp[3] = vertices[indices[i*3+2]*3] - vertices[indices[i*3]*3];
+      temp[4] = vertices[indices[i*3+2]*3 + 1] - vertices[indices[i*3]*3 + 1];
+      temp[5] = vertices[indices[i*3+2]*3 + 2] - vertices[indices[i*3]*3 + 2];
+
+      temp[6] = (temp[1] * temp[5]) - (temp[2] * temp[4]);
+      temp[7] = (temp[2] * temp[3]) - (temp[0] * temp[5]);
+      temp[8] = (temp[0] * temp[4]) - (temp[1] * temp[3]);
+      if(temp[6] == 0){temp[6] = 0;}
+      if(temp[7] == 0){temp[7] = 0;}
+      if(temp[8] == 0){temp[8] = 0;}
+      //console.log(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]);
+      //console.log(temp[6], temp[7], temp[8]);
+
+      temp[9] = Math.sqrt( temp[6]*temp[6] + temp[7]*temp[7] + temp[8]*temp[8] );
+      // console.log("|n| = ",temp[9]);
+
+      for( var j = 0; j < 3; j++){
+          normals[count] = temp[6] / temp[9];
+          normals[count+1] = temp[7] / temp[9];
+          normals[count+2] = temp[8] / temp[9];
+          count = count + 3;
+      }
+
+      //console.log("i = ",i*3, "   i + 1 = ", (i*3+1), "   i + 2 = ", (i*3+2));
+      // console.log(i, " nuova normale:", normals[count], normals[count+1], normals[count+2]);
+      // console.log("count = ", count);
+      // console.log("normali:",normals);
+
+  }
+
+
+  // Write the vertex property to buffers (coordinates and normals)
+  // Same data can be used for vertex and normal
+  // In order to make it intelligible, another buffer is prepared separately
+  if (!initArrayBuffer(gl, 'a_Position', new Float32Array(vertices), gl.FLOAT, 3)) return -1;
+  if (!initArrayBuffer(gl, 'a_Normal'  , new Float32Array(normals)  , gl.FLOAT, 3)) return -1;
+
+  // Unbind the buffer object
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+  // Write the indices to the buffer object
+  var indexBuffer = gl.createBuffer();
+  if (!indexBuffer) {
+    console.log('Failed to create the buffer object');
+    return -1;
+  }
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+
+  return indices.length;
+}
+
+
 
 function initVertexBuffersCube(gl) {
   // Create a cube
