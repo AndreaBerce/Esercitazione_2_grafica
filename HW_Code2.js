@@ -487,6 +487,36 @@ function initVertexBuffersCube(gl) {
      1.0,-1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0, 1.0,-1.0,   1.0, 1.0,-1.0  // v4-v7-v6-v5 back
   ]);
 
+  var normals = new Float32Array(positions.length);
+  var temp = new Float32Array(10);
+  for( var  i = 0; i < 6; i++){
+      temp[0] = positions[i*12 + 3] - positions[i*12];
+      temp[1] = positions[i*12 + 4] - positions[i*12 + 1];
+      temp[2] = positions[i*12 + 5] - positions[i*12 + 2];
+
+      temp[3] = positions[i*12 + 6] - positions[i*12];
+      temp[4] = positions[i*12 + 7] - positions[i*12 + 1];
+      temp[5] = positions[i*12 + 8] - positions[i*12 + 2];
+
+      temp[6] = (temp[1] * temp[5]) - (temp[2] * temp[4]);
+      temp[7] = (temp[2] * temp[3]) - (temp[0] * temp[5]);
+      temp[8] = (temp[0] * temp[4]) - (temp[1] * temp[3]);
+      if(temp[6] == 0){temp[6] = 0;}
+      if(temp[7] == 0){temp[7] = 0;}
+      if(temp[8] == 0){temp[8] = 0;}
+      console.log(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]);
+      console.log(temp[6], temp[7], temp[8]);
+
+      temp[9] = Math.sqrt( temp[6]*temp[6] + temp[7]*temp[7] + temp[8]*temp[8] );
+      console.log(temp[9]);
+      for( var j = 0; j < 4; j++){
+          normals[i*12 + j*3] = temp[6] / temp[9];
+          normals[i*12 + j*3 + 1] = temp[7] / temp[9];
+          normals[i*12 + j*3 + 2] = temp[8] / temp[9];
+      }
+      console.log(normals);
+  }
+/*
   // Normal
   var normals = new Float32Array([
     0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,  // v0-v1-v2-v3 front
@@ -496,7 +526,7 @@ function initVertexBuffersCube(gl) {
     0.0,-1.0, 0.0,   0.0,-1.0, 0.0,   0.0,-1.0, 0.0,   0.0,-1.0, 0.0,  // v7-v4-v3-v2 down
     0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0,   0.0, 0.0,-1.0   // v4-v7-v6-v5 back
   ]);
-
+*/
   // Indices of the vertices
   var indices = new Uint16Array([
      0, 1, 2,   0, 2, 3,    // front
