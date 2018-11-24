@@ -74,20 +74,12 @@ function main() {
   // Set the vertex coordinates, the color and the normal
   //var n = initVertexBuffersCube(gl);
 
-  var raggio = Math.sqrt(2);
-  var centri = new Float32Array([0,1, 0,1, 0,-1, 0,-1]);
-  var dimensioni = new Float32Array([0, raggio, raggio, 0]);
-  var precisioneC = 4;
 
-  var n = genericHedron(gl, centri, dimensioni, precisioneC);
+  var precisioneC = 100;
+  var centri = new Float32Array(precisioneC*2);
+  var dimensioni = new Float32Array(precisioneC);
 
-
-
-  precisioneC = 100;
-  centri = new Float32Array(precisioneC*2);
-  dimensioni = new Float32Array(precisioneC);
-
-  raggio = 1;
+  var raggio = 1;
   var angolo = Math.PI / 2;
   for(var i = 0; i < precisioneC; i++){
      centri[i*2] = 0;                                // x
@@ -517,7 +509,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   var vertices = new Float32Array(nv);
 
   // Indices of the vertices
-  var indices = new Uint16Array(ni);
+  var indices = new Uint32Array(ni);
 
   var count = 0;
   var angolo = Math.PI / 4;
@@ -544,9 +536,9 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                   indices[ind] = ind;
                   indices[ind+1] = ind+1;
                   indices[ind+2] = ind+2;
+                  ind = ind + 3;
 
                   count = count + 9;
-                  ind = ind + 3;
               }
           }else{ // se prima c'era un poligolo
               //console.log("vertici:", vertices);
@@ -618,8 +610,9 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                   indices[ind] = ind;
                   indices[ind+1] = ind+1;
                   indices[ind+2] = ind+2;
-                  count = count + 9;
                   ind = ind + 3;
+                  count = count + 9;
+
                   // console.log("j = ", j);
                   // console.log("count = ", count);
               }
@@ -629,12 +622,6 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   }
   //console.log("vertici:", vertices);
   //console.log("indici:", indices);
-
-  // Indices of the vertices
-  var indices = new Uint16Array(ni);
-  for( var i = 0; i < ni; i++ ){
-      indices[i] = i;
-  }
 
 
   var normals = new Float32Array(vertices.length);
