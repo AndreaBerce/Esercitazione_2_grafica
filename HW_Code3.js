@@ -130,8 +130,8 @@ function main() {
   dimensioni[0] = 0;
   dimensioni[precisioneC-1] = 0;
 
-  n = genericHedron(gl, centri, dimensioni, precisioneC);
-
+  var n = genericHedron(gl, centri, dimensioni, precisioneC);
+  //var n = genericHedron(gl, [0,1, 0,1, 0,-1, 0,-1], [0, Math.sqrt(2), Math.sqrt(2), 0], 4);
 
 
 
@@ -534,16 +534,19 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
       if( distanza[i] > 0 ){
           if( distanza[i-1] == 0 ){ // se prima c'era un punto
               ni = ni + precisioneC * 3;  // ni = ni + nTriangoli * nVertitiTriangolo
+              nv = nv + precisioneC * 3;
           }else{ // se prima c'era un poligolo
               ni = ni + precisioneC * 6;  // ni = ni + nTriangoli * 2 * nVertitiTriangolo
+              nv = nv + precisioneC * 4;
           }
       }else{
           if( i > 0 && distanza[i-1] != 0 ){ // se prima c'era un poligono
               ni = ni + precisioneC * 3;  // ni = ni + nTriangoli * nVertitiTriangolo
+              nv = nv + precisioneC * 3;
           }
       }
   }
-  nv = ni * 3;
+  nv = nv * 3;
 
   // creazione del vettore dei vertici
   var vertices = new Float32Array(nv);
@@ -554,6 +557,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   var count = 0;
   var angolo = Math.PI / 4;
   var ind = 0;
+  var ind2 = 0;
 
   for( var i = 0; i < (centri.length / 2); i++ ){
       if( distanza[i] > 0 ){
@@ -573,11 +577,12 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                   vertices[count+7] = centri[i*2 + 1];                                    // y
                   vertices[count+8] = distanza[i] * Math.sin(angolo);                     // Z
 
-                  indices[ind] = ind;
-                  indices[ind+1] = ind+1;
-                  indices[ind+2] = ind+2;
-                  ind = ind + 3;
+                  indices[ind] = ind2;
+                  indices[ind+1] = ind2+1;
+                  indices[ind+2] = ind2+2;
 
+                  ind = ind + 3;
+                  ind2 = ind2 + 3;
                   count = count + 9;
               }
           }else{ // se prima c'era un poligolo
@@ -600,30 +605,22 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                   vertices[count+4] = centri[i*2 + 1];                                    // y
                   vertices[count+5] = distanza[i] * Math.sin(angolo);                     // Z
 
-                  indices[ind] = ind;
-                  indices[ind+1] = ind+1;
-                  indices[ind+2] = ind+2;
-
-                  //1
-                  vertices[count+9] = vertices[count+6];
-                  vertices[count+10] = vertices[count+7];
-                  vertices[count+11] = vertices[count+8];
-
-                  //6
-                  vertices[count+12] = vertices[count+3];
-                  vertices[count+13] = vertices[count+4];
-                  vertices[count+14] = vertices[count+5];
+                  indices[ind] = ind2;  // 5
+                  indices[ind+1] = ind2+1;  // 6
+                  indices[ind+2] = ind2+2;  // 1
 
                   //2
-                  vertices[count+15] = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo);// x
-                  vertices[count+16] = centri[(i-1)*2 + 1];                               // y
-                  vertices[count+17] = distanza[i-1] * Math.sin(angolo);                  // Z
+                  vertices[count+9] = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo); // x
+                  vertices[count+10] = centri[(i-1)*2 + 1];                               // y
+                  vertices[count+11] = distanza[i-1] * Math.sin(angolo);                  // Z
 
-                  indices[ind+3] = ind+3;
-                  indices[ind+4] = ind+4;
-                  indices[ind+5] = ind+5;
+                  indices[ind+3] = ind2+2; // 1
+                  indices[ind+4] = ind2+1; // 6
+                  indices[ind+5] = ind2+3; // 2
+
                   ind = ind + 6;
-                  count = count + 18;
+                  ind2 = ind2 + 4;
+                  count = count + 12;
               }
           }
       }else{
@@ -647,10 +644,12 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                   // console.log("angolo = ", angolo);
                   // console.log("valori: ", vertices[count], vertices[count+1], vertices[count+2], vertices[count+3], vertices[count+4], vertices[count+5], vertices[count+6], vertices[count+7], vertices[count+8]);
 
-                  indices[ind] = ind;
-                  indices[ind+1] = ind+1;
-                  indices[ind+2] = ind+2;
+                  indices[ind] = ind2;
+                  indices[ind+1] = ind2+1;
+                  indices[ind+2] = ind2+2;
+
                   ind = ind + 3;
+                  ind2 = ind2 + 3;
                   count = count + 9;
 
                   // console.log("j = ", j);
@@ -659,9 +658,9 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           }
       }
       //console.log("vertici:", vertices);
+      //console.log("indici:", indices);
   }
   //console.log("vertici:", vertices);
-  //console.log("indici:", indices);
 
 
   var normals = new Float32Array(vertices.length);
@@ -678,9 +677,9 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
       temp[1] = vertices[indices[i*3]*3 + 1] - vertices[indices[i*3+1]*3 + 1];
       temp[2] = vertices[indices[i*3]*3 + 2] - vertices[indices[i*3+1]*3 + 2];
 
-      temp[3] = vertices[indices[i*3+2]*3] - vertices[indices[i*3]*3];
-      temp[4] = vertices[indices[i*3+2]*3 + 1] - vertices[indices[i*3]*3 + 1];
-      temp[5] = vertices[indices[i*3+2]*3 + 2] - vertices[indices[i*3]*3 + 2];
+      temp[3] = vertices[indices[i*3+2]*3] - vertices[indices[i*3+1]*3];
+      temp[4] = vertices[indices[i*3+2]*3 + 1] - vertices[indices[i*3+1]*3 + 1];
+      temp[5] = vertices[indices[i*3+2]*3 + 2] - vertices[indices[i*3+1]*3 + 2];
 
       temp[6] = (temp[1] * temp[5]) - (temp[2] * temp[4]);
       temp[7] = (temp[2] * temp[3]) - (temp[0] * temp[5]);
@@ -688,22 +687,20 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
       if(temp[6] == 0){temp[6] = 0;}
       if(temp[7] == 0){temp[7] = 0;}
       if(temp[8] == 0){temp[8] = 0;}
-      //console.log(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]);
+      // console.log(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]);
       //console.log(temp[6], temp[7], temp[8]);
 
       temp[9] = Math.sqrt( temp[6]*temp[6] + temp[7]*temp[7] + temp[8]*temp[8] );
-      // console.log("|n| = ",temp[9]);
+      //console.log("|n| = ",temp[9]);
 
       for( var j = 0; j < 3; j++){
-          normals[count] = temp[6] / temp[9];
-          normals[count+1] = temp[7] / temp[9];
-          normals[count+2] = temp[8] / temp[9];
-          count = count + 3;
+          normals[indices[i*3+j]*3] = temp[6] / temp[9];
+          normals[indices[i*3+j]*3+1] = temp[7] / temp[9];
+          normals[indices[i*3+j]*3+2] = temp[8] / temp[9];
       }
 
-      //console.log("i = ",i*3, "   i + 1 = ", (i*3+1), "   i + 2 = ", (i*3+2));
-      // console.log(i, " nuova normale:", normals[count], normals[count+1], normals[count+2]);
-      // console.log("count = ", count);
+      // console.log("i = ",i*3, "   i + 1 = ", (i*3+1), "   i + 2 = ", (i*3+2));
+      // console.log(i, " nuova normale:", normals[indices[i*3+j]*3], normals[indices[i*3+j]*3+1], normals[indices[i*3+j]*3// +2]);
       // console.log("normali:",normals);
 
   }
