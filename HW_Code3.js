@@ -115,24 +115,11 @@ function main() {
   //var n = initVertexBuffersCube(gl);
 
 
-  var precisioneC = 100;
-  var centri = new Float32Array(precisioneC*2);
-  var dimensioni = new Float32Array(precisioneC);
-
-  var raggio = 1;
-  var angolo = Math.PI / 2;
-  for(var i = 0; i < precisioneC; i++){
-     centri[i*2] = 0;                                // x
-     centri[i*2+1] = raggio * Math.sin(angolo);      // y
-     dimensioni[i] = raggio * Math.cos(angolo);
-     angolo = angolo - ( Math.PI / (precisioneC - 1) );
-  }
-  dimensioni[0] = 0;
-  dimensioni[precisioneC-1] = 0;
+  var centri = new Float32Array([0,1, 0,1, 0,-1, 0,-1]);
+  var dimensioni = new Float32Array([0, 1, 1, 0]);
+  var precisioneC = 300;
 
   var n = genericHedron(gl, centri, dimensioni, precisioneC);
-  //var n = genericHedron(gl, [0,1, 0,1, 0,-1, 0,-1], [0, Math.sqrt(2), Math.sqrt(2), 0], 4);
-
 
 
   if (n < 0) {
