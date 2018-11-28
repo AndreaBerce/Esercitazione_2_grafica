@@ -233,17 +233,17 @@ function main() {
      //n = initVertexBuffers(gl);
      centri = [];
      dimensioni = [];
-     precisioneC = 40;
+     precisioneC = 10;
      // Genero i punti del cerchio principale
      raggio = 1.1;
      var raggino = 0.3;
-     
+
      for(var i = 0; i <= 2*Math.PI; i+= 2*Math.PI/precisioneC){
         centri.push(raggio * Math.cos(i));                                // x
         centri.push(raggio * Math.sin(i));                                // y
         dimensioni.push(raggino);
      }
-     
+
      //Il primo elemento si ripete
      centri.unshift(centri[1]);
      centri.unshift(centri[1]); //Pusho di nuovo lo stesso perché ora sono shiftati dopo il primo unshift
@@ -255,11 +255,11 @@ function main() {
      console.clear();
      console.log("TORO\n");
 
-     console.log(centri);
-     console.log(dimensioni);
+     console.log("centri:", centri);
+     console.log("dimensioni:", dimensioni);
 
-     
-     
+
+
      n = genericHedron(gl, new Float32Array(centri), new Float32Array(dimensioni), precisioneC);
 
 	   // Iterate over all controllers
@@ -273,7 +273,7 @@ function main() {
   //*********************************************************************************
   var tick = function() {
 
-      currentAngle = animate(currentAngle);  // Update the rotation angle
+      //currentAngle = animate(currentAngle);  // Update the rotation angle
       // Calculate the model matrix
       modelMatrix.setRotate(currentAngle, -1, 0, 0); // Rotate around the y-axis
 
@@ -284,7 +284,7 @@ function main() {
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
       // Draw the cube
-      gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
+      gl.drawElements(gl.LINE_STRIP, n, gl.UNSIGNED_SHORT, 0);
 
       requestAnimationFrame(tick, canvas); // Request that the browser ?calls tick
   };
@@ -303,7 +303,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   var nv = 0; // numero vertici
   var ni = 0; // numero indici
 
-  
+
   // Probabilmente non così utile, visto che si usano i push
   var precedentePunto=true;
   for(var i = 0; i < (centri.length / 2); i++){
@@ -322,11 +322,11 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           }
           precedentePunto=true;
       }
-      
+
   }
   nv = nv * 3;
 
-  
+
 
   // creazione del vettore dei vertici
   var vertices = [];
@@ -345,7 +345,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
 
   // Controllo se è un solido chiuso
   if(centri[0] == centri[centri.length-2] && centri[1] == centri[centri.length-1])  isClosed = true;
-    
+
   xCentro = 0;
   yCentro = 0;
   for(var i=0; i<centri.length/2; i++){
@@ -356,7 +356,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   yCentro /= centri.length/2;
 
   console.log("Centro della figura = (" +xCentro+ "," +yCentro+ ")");
-    
+
 
   var angolo = Math.PI / 4;
   var ind = 0; // TODO: forse si può togliere gli ind per usare invece push
@@ -367,7 +367,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
       //stfu gli altri <3
       //var alpha = Math.atan2(centri[i*2 +1] - centri[(i-1)*2 +1], centri[i*2] - centri[(i-1)*2]); // Arcsin(y2-y1, x2-x1)
       //console.log("\nAngolo: "+alpha);
-          
+
               var y2 = centri[i*2 +1];
               var y1 = yCentro;
               var x2 = centri[i*2];
@@ -375,16 +375,16 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
               var m1 = (y2-y1)/(x2-x1); // Trovo la m del poligono corrente
 
               var alphaCorrente = Math.atan(m1);
-              
+
               var q = y2 - m1*x2;
 
               console.log("Angolo: "+ alphaCorrente);
-          
+
       if(distanza[i] > 0){  // Se deve essere un poligono
 
           // Intanto dobbiamo in ogni caso calcolare i punti dell'nAgono che lo circonda.
           for(var j = 0; j < precisioneC; j++){
-            
+
             var x = centri[i*2] + distanza[i] * Math.cos(angolo);
             if(isClosed) x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
             var y = centri[i*2 + 1];
@@ -397,20 +397,20 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
             vertices.push(z);        // Z
 
             angolo = angolo + ( 2 * Math.PI/precisioneC );
-            
+
 
             //TEST colorstep
             colors.push(g_colors[0]);
             colors.push(g_colors[1]);
             colors.push(g_colors[2]);
 
-            
-            
+
+
           }
           if( distanza[i-1] == 0 ){ // Se il precedente era un punto con distanza 0
-              
+
               for( var j = 0; j < precisioneC ; j++ ){
-                  
+
                   indices[ind] = tempInd;
                   indices[ind+1] = tempInd2+1;
                   indices[ind+2] = tempInd2+2;
@@ -439,7 +439,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
               tempInd2 = tempInd2 - precisioneC;
               var temp = tempInd; // Mi salvo dov'era ind prima delle modifiche di questo ciclo
               var temp2 = tempInd2 + 1;
-              
+
               for( var j = 0; j < precisioneC; j++ ){
 
                 indices[ind] = tempInd;
@@ -461,7 +461,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
               tempInd2 = tempInd-1;
           }
       }else{
-          
+
           vertices.push(centri[i*2]);
           vertices.push(centri[i*2 + 1]);
           vertices.push(0);
@@ -474,15 +474,15 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
           colors[colors.length-1] = 1;
           colors[colors.length -2] = 1;
           colors[colors.length -3] = 1;
-          
-          
+
+
           if( i != 0 ){
-              
+
               tempInd = tempInd2 + 1;
               tempInd2 = tempInd2 - precisioneC + 1;
-              
+
               for( var j = 0; j < precisioneC; j++ ){
-                  
+
                   indices[ind] = tempInd;
                   indices[ind+1] = tempInd2;
                   indices[ind+2] = tempInd2+1;
