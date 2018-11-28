@@ -368,43 +368,47 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
       //var alpha = Math.atan2(centri[i*2 +1] - centri[(i-1)*2 +1], centri[i*2] - centri[(i-1)*2]); // Arcsin(y2-y1, x2-x1)
       //console.log("\nAngolo: "+alpha);
 
-              var y2 = centri[i*2 +1];
-              var y1 = yCentro;
-              var x2 = centri[i*2];
-              var x1 = yCentro;
-              var m1 = (y2-y1)/(x2-x1); // Trovo la m del poligono corrente
+      var y2 = centri[i*2 +1];
+      var y1 = yCentro;
+      var x2 = centri[i*2];
+      var x1 = yCentro;
+      var m1 = (y2-y1)/(x2-x1); // Trovo la m del poligono corrente
 
-              var alphaCorrente = Math.atan(m1);
+      var alphaCorrente = Math.atan(m1);
 
-              var q = y2 - m1*x2;
+      var q = y2 - m1*x2;
 
-              console.log("Angolo: "+ alphaCorrente);
+      console.log("Angolo: "+ alphaCorrente);
 
       if(distanza[i] > 0){  // Se deve essere un poligono
 
           // Intanto dobbiamo in ogni caso calcolare i punti dell'nAgono che lo circonda.
           for(var j = 0; j < precisioneC; j++){
 
-            var x = centri[i*2] + distanza[i] * Math.cos(angolo);
-            if(isClosed) x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
-            var y = centri[i*2 + 1];
-            if(isClosed) y = centri[i*2 +1] + distanza[i] * Math.cos(angolo) * Math.sin(alphaCorrente);
-            var z = distanza[i] * Math.sin(angolo);
+              var x = centri[i*2] + distanza[i] * Math.cos(angolo);
+              if(isClosed){
+                  x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
+              }
+
+              var y = centri[i*2 + 1];
+              if(isClosed){
+                  y = centri[i*2 +1] + distanza[i] * Math.cos(angolo) * Math.sin(alphaCorrente);
+              }
+
+              var z = distanza[i] * Math.sin(angolo);
 
 
-            vertices.push(x);        // x
-            vertices.push(y);        // y
-            vertices.push(z);        // Z
+              vertices.push(x);        // x
+              vertices.push(y);        // y
+              vertices.push(z);        // Z
 
-            angolo = angolo + ( 2 * Math.PI/precisioneC );
-
-
-            //TEST colorstep
-            colors.push(g_colors[0]);
-            colors.push(g_colors[1]);
-            colors.push(g_colors[2]);
+              angolo = angolo + ( 2 * Math.PI/precisioneC );
 
 
+              //TEST colorstep
+              colors.push(g_colors[0]);
+              colors.push(g_colors[1]);
+              colors.push(g_colors[2]);
 
           }
           if( distanza[i-1] == 0 ){ // Se il precedente era un punto con distanza 0
@@ -416,7 +420,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                   indices[ind+2] = tempInd2+2;
                   ind = ind + 3;
                   tempInd2 = tempInd2 + 1;
-                  ;
+                  
               }
               indices[ind-1] = tempInd + 1;
           }else{  // Se il precedente era un poligono
@@ -442,7 +446,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
 
               for( var j = 0; j < precisioneC; j++ ){
 
-                indices[ind] = tempInd;
+                  indices[ind] = tempInd;
                   indices[ind+1] = tempInd+1;
                   indices[ind+2] = tempInd2+1;
 
