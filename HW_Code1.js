@@ -42,8 +42,6 @@ function main() {
     return;
   }
 
-
-
   // Set the clear color and enable the depth test
   gl.clearColor(0, 0, 0, 1);
   gl.enable(gl.DEPTH_TEST);
@@ -64,8 +62,6 @@ function main() {
   var currentAngle = 0.0;  // Current rotation angle
   var modelMatrix = new Matrix4();  // Model matrix
   var mvpMatrix = new Matrix4();    // Model view projection matrix
-
-
 
   //*********************************************************************
   // creo una GUI con dat.gui
@@ -104,12 +100,10 @@ function main() {
     g_colors.push(colore.color0[0]/255);
     g_colors.push(colore.color0[1]/255);
     g_colors.push(colore.color0[2]/255);
-    return n = genericHedron(gl, centri, dimensioni, precisioneC);
+    return n = circleDrag(gl, centri, dimensioni, precisioneC);
   }
 
-
-  //
-  var n = genericHedron(gl, centri, dimensioni, precisioneC);
+  var n = circleDrag(gl, centri, dimensioni, precisioneC);
   if (n < 0) {
     console.log('Failed to set the vertex information');
     return;
@@ -127,12 +121,12 @@ function main() {
     		geometria.torus = false;
 	   }
 
-     raggio = Math.sqrt(2);
-     centri = new Float32Array([0,1, 0,1, 0,-1, 0,-1]);
+     raggio = 0.8*Math.sqrt(2);
+     centri = new Float32Array([0,0.8, 0,0.8, 0,-0.8, 0,-0.8]);
      dimensioni = new Float32Array([0, raggio, raggio, 0]);
      precisioneC = 4;
 
-     n = genericHedron(gl, centri, dimensioni, precisioneC);
+     n = circleDrag(gl, centri, dimensioni, precisioneC);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
@@ -140,8 +134,6 @@ function main() {
      }
    });
   gui.add(geometria,'cone').onFinishChange(function(value) {
-    // Fires when a controller loses focus.
-       // Fires when a controller loses focus.
 	   if(value == true){
     		geometria.cube = false;
     		geometria.cone = value;
@@ -151,11 +143,11 @@ function main() {
 	   }
 
 
-     centri = new Float32Array([0,1, 0,-1, 0,-1]);
-     dimensioni = new Float32Array([0, 1, 0]);
-     precisioneC = 64;
+     centri = new Float32Array([0,1, 0,-0.9, 0,-0.9]);
+     dimensioni = new Float32Array([0, 0.7, 0]);
+     precisioneC = 128;
 
-     n = genericHedron(gl, centri, dimensioni, precisioneC);
+     n = circleDrag(gl, centri, dimensioni, precisioneC);
 
 
 	   // Iterate over all controllers
@@ -164,8 +156,6 @@ function main() {
      }
    });
   gui.add(geometria,'cylinder').onFinishChange(function(value) {
-    // Fires when a controller loses focus.
-       // Fires when a controller loses focus.
 	   if(value == true){
     		geometria.cube = false;
     		geometria.cone = false;
@@ -174,20 +164,19 @@ function main() {
     		geometria.torus = false;
 	   }
 
-     centri = new Float32Array([0,1, 0,1, 0,-1, 0,-1]);
-     dimensioni = new Float32Array([0, 1, 1, 0]);
-     precisioneC = 64;
+     centri = new Float32Array([0,0.8, 0,0.8, 0,-0.8, 0,-0.8]);
+     dimensioni = new Float32Array([0, 0.8, 0.8, 0]);
+     precisioneC = 128;
 
-     n = genericHedron(gl, centri, dimensioni, precisioneC);
+     n = circleDrag(gl, centri, dimensioni, precisioneC);
 
 	   // Iterate over all controllers
      for (var i in gui.__controllers) {
         gui.__controllers[i].updateDisplay();
      }
    });
+
   gui.add(geometria,'sphere').onFinishChange(function(value) {
-    // Fires when a controller loses focus.
-       // Fires when a controller loses focus.
 	   if(value == true){
     		geometria.cube = false;
     		geometria.cone = false;
@@ -196,14 +185,14 @@ function main() {
     		geometria.torus = false;
 	   }
 
-     precisioneC = 50;
+     precisioneC = 128;
      centri = new Float32Array(precisioneC*2);
      dimensioni = new Float32Array(precisioneC);
 
      raggio = 1;
      var angolo = Math.PI / 2;
      for(var i = 0; i < precisioneC; i++){
-        centri[i*2] = 1;                                // x
+        centri[i*2] = 0;                                // x
         centri[i*2+1] = raggio * Math.sin(angolo);      // y
         dimensioni[i] = raggio * Math.cos(angolo);
         angolo = angolo - ( Math.PI / (precisioneC - 1) );
@@ -211,17 +200,15 @@ function main() {
      dimensioni[0] = 0;
      dimensioni[precisioneC-1] = 0;
 
-     console.log("SFERA\n");
-     n = genericHedron(gl, centri, dimensioni, precisioneC);
+     n = circleDrag(gl, centri, dimensioni, precisioneC);
 
-	   // Iterate over all controllers
+	// Iterate over all controllers
      for (var i in gui.__controllers) {
         gui.__controllers[i].updateDisplay();
      }
    });
   gui.add(geometria,'torus').onFinishChange(function(value) {
-    // Fires when a controller loses focus.
-       // Fires when a controller loses focus.
+    // Fires when a controller loses focus
 	   if(value == true){
     		geometria.cube = false;
     		geometria.cone = false;
@@ -230,39 +217,32 @@ function main() {
     		geometria.torus = value;
 	   }
 
-     //n = initVertexBuffers(gl);
      centri = [];
      dimensioni = [];
-     precisioneC = 8;
+     precisioneC = 128;
+
      // Genero i punti del cerchio principale
-     raggio = 1.1;
+     raggione = 1.1;
      var raggino = 0.3;
 
      for(var i = 0; i <= 2*Math.PI; i+= 2*Math.PI/precisioneC){
-        centri.push(raggio * Math.cos(i));                                // x
-        centri.push(raggio * Math.sin(i));                                // y
-        dimensioni.push(raggino);
+        centri.push(raggione * Math.cos(i));                                // x
+        centri.push(raggione * Math.sin(i));                                // y
+        dimensioni.push(raggino);                                           // Raggio dei cerchi
      }
 
      //Il primo elemento si ripete
      centri.unshift(centri[1]);
      centri.unshift(centri[1]); //Pusho di nuovo lo stesso perché ora sono shiftati dopo il primo unshift
      dimensioni.unshift(0);
-
+     //Ripeto anche l'ultimo, che sarà uguale al primo essendo una figura chiusa.
      centri.push(centri[0]);
      centri.push(centri[1]);
      dimensioni.push(raggino);
-     console.clear();
-     console.log("TORO\n");
 
-     console.log("centri:", centri);
-     console.log("dimensioni:", dimensioni);
+     n = circleDrag(gl, new Float32Array(centri), new Float32Array(dimensioni), precisioneC);
 
-
-
-     n = genericHedron(gl, new Float32Array(centri), new Float32Array(dimensioni), precisioneC);
-
-	   // Iterate over all controllers
+    // Iterate over all controllers
      for (var i in gui.__controllers) {
         gui.__controllers[i].updateDisplay();
      }
@@ -271,32 +251,27 @@ function main() {
 
 
   //*********************************************************************************
-  var tick = function() {
+    var tick = function() {
+        currentAngle = animate(currentAngle);  // Update the rotation angle
+        // Calculate the model matrix
+        modelMatrix.setRotate(currentAngle, -1, 0, 0); // Rotate around the y-axis
 
-      currentAngle = animate(currentAngle);  // Update the rotation angle
-      // Calculate the model matrix
-      modelMatrix.setRotate(currentAngle, -1, 0, 0); // Rotate around the y-axis
+        mvpMatrix.set(vpMatrix).multiply(modelMatrix);
+        gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
 
-      mvpMatrix.set(vpMatrix).multiply(modelMatrix);
-      gl.uniformMatrix4fv(u_MvpMatrix, false, mvpMatrix.elements);
+        // Clear color and depth buffer
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-      // Clear color and depth buffer
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        // Draw the cube
+        gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
 
-      // Draw the cube
-      gl.drawElements(gl.LINE_STRIP, n, gl.UNSIGNED_SHORT, 0);
-
-      requestAnimationFrame(tick, canvas); // Request that the browser ?calls tick
-  };
+        requestAnimationFrame(tick, canvas); // Request that the browser ?calls tick
+    };
   tick();
 }
 
-function precision(x) {
-  return Number.parseFloat(x).toPrecision(3);
-}
-
-function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri, distanza punti da centri, precisione cerchi
-  var isClosed = false;
+function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, distanza punti da centri, precisione cerchi
+  var isClosed = false; // Variabile che dice se la figura è chiusa
   var xCentro;
   var yCentro;
   // calcolo numero di vertici della figura
@@ -340,6 +315,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   }
 
   // Indices of the vertices
+  
   var indices = new Uint16Array(ni);
 
 
@@ -358,7 +334,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   console.log("Centro della figura = (" +xCentro+ "," +yCentro+ ")");
 
 
-  var angolo = 0;
+  var angolo = Math.PI/4;
   var ind = 0; // TODO: forse si può togliere gli ind per usare invece push
   var tempInd = 0;
   var tempInd2 = 0;
