@@ -77,14 +77,11 @@ function main() {
   g_colors.push(colore.color0[2]/255);
 
 
-  var raggio = Math.sqrt(2);
-
-  var centri = new Float32Array([0,1,0,1,0,-1,0,-1]);
-  var dimensioni = new Float32Array([0,raggio,raggio,0]);
+  var raggio = 0.8*Math.sqrt(2);
+  var centri = new Float32Array([0,0.8, 0,0.8, 0,-0.8, 0,-0.8]);
+  var dimensioni = new Float32Array([0, raggio, raggio, 0]);
   var precisioneC = 4;
 
-
-  //
   gui.addColor(colore,'color0').onFinishChange(function(value) {
 	  console.log(value);
     refreshhh();
@@ -113,13 +110,13 @@ function main() {
   //------------------------------------------------------------------
   gui.add(geometria,'cube').onFinishChange(function(value) {
     // Fires when a controller loses focus.
-	   if(value == true){
-    		geometria.cube = value;
-    		geometria.cone = false;
-    		geometria.cylinder = false;
-    		geometria.sphere = false;
-    		geometria.torus = false;
-	   }
+    if(value == true){
+        geometria.cube = value;
+        geometria.cone = false;
+        geometria.cylinder = false;
+        geometria.sphere = false;
+        geometria.torus = false;
+    }
 
      raggio = 0.8*Math.sqrt(2);
      centri = new Float32Array([0,0.8, 0,0.8, 0,-0.8, 0,-0.8]);
@@ -272,14 +269,10 @@ function main() {
 
 function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, distanza punti da centri, precisione cerchi
   var isClosed = false; // Variabile che dice se la figura è chiusa
-  var xCentro;
-  var yCentro;
+
   // calcolo numero di vertici della figura
   var nv = 0; // numero vertici
   var ni = 0; // numero indici
-
-
-  // Probabilmente non così utile, visto che si usano i push
   var precedentePunto=true;
   for(var i = 0; i < (centri.length / 2); i++){
       if(distanza[i] > 0){
@@ -301,12 +294,9 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
   }
   nv = nv * 3;
 
-
-
   // creazione del vettore dei vertici
   var vertices = [];
   var colors = [];
-  var colorStep = 0.05;
 
   for(var i=0; i < nv/3; i++){
     colors.push(g_colors[0]);
@@ -315,81 +305,36 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
   }
 
   // Indices of the vertices
-  
   var indices = new Uint16Array(ni);
 
-
   // Controllo se è un solido chiuso
-  if(centri[0] == centri[centri.length-2] && centri[1] == centri[centri.length-1])  isClosed = true;
-  // Calcolo il centro tra tutti i vertici della figura. Se è chiusa, lo usiamo
-  xCentro = 0;
-  yCentro = 0;
-  for(var i=0; i<centri.length/2; i++){
-      xCentro += centri[i*2];
-      yCentro += centri[i*2 +1];
+  if(centri[0] == centri[centri.length-2] && centri[1] == centri[centri.length-1]){
+    isClosed = true;
   }
-  xCentro /= centri.length/2;
-  yCentro /= centri.length/2;
-
-  console.log("Centro della figura = (" +xCentro+ "," +yCentro+ ")");
-
 
   var angolo = Math.PI/4;
-  var ind = 0; // TODO: forse si può togliere gli ind per usare invece push
+  var ind = 0;
   var tempInd = 0;
   var tempInd2 = 0;
   for(var i = 0; i < (centri.length / 2); i++ ){  // Per ognuno dei punti ricevuti
-
       //stfu gli altri <3
-      //var alpha = Math.atan2(centri[i*2 +1] - centri[(i-1)*2 +1], centri[i*2] - centri[(i-1)*2]); // Arcsin(y2-y1, x2-x1)
-      //console.log("\nAngolo: "+alpha);
 
-      var y2 = centri[i*2 +1];
-      var y1 = yCentro;
-      var x2 = centri[i*2];
-      var x1 = yCentro;
-      var m1 = (y2-y1)/(x2-x1); // Trovo la m del poligono corrente
-
-      var alphaCorrente = Math.atan(m1);
-      /*
-      if((Math.cos(alphaCorrente) < 0 && Math.sin(alphaCorrente) > 0) || (Math.cos(alphaCorrente) > 0 && Math.sin(alphaCorrente) < 0)){
-          alphaCorrente += Math.PI;
-      }*/
-      //TODO: se funziona, togliere il primo if che è superfluo
-      
-      //if(i-1 > precisioneC/4*1 && i-1 < precisioneC/4*2 || i-1 > precisioneC/4*3 && i-1 < precisioneC/4*4){
-          //alphaCorrente += Math.PI;
-          //console.log("Siamo nell 2* o 4* quadrante. Angolo: ", alphaCorrente);
-      //}
-
-      // Nuovo tentativo: trovo l'angolo attraverso le operazioni vettoriali
-      //alphaCorrente = Math.acos( (x2*1 + y2*0) / Math.sqrt(x2*x2 + y2*y2));
+      // Trovo l'angolo corrente sul cerchio principale
       if(i == 0 || (i-2) == precisioneC) alphaCorrente = 0;
-      else alphaCorrente = (i-1) * 2*Math.PI/precisioneC;
-
-      var q = y2 - m1*x2;
-
-      console.log("Angolo: "+ alphaCorrente);
+      else alphaCorrente = (i-1) * 2*Math.PI/precisioneC; 
 
       if(distanza[i] > 0){  // Se deve essere un poligono
         
           // Intanto dobbiamo in ogni caso calcolare i punti dell'nAgono che lo circonda.
           for(var j = 0; j < precisioneC; j++){
-
+              // Calcolo delle coordinate dei punti sui cerchi minori
               var x = centri[i*2] + distanza[i] * Math.cos(angolo);
-              if(isClosed){
-                  
-                    x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
-              }
-
+              if(isClosed) // Se è chiuso i cerchi non saranno tutti angolati 0, ma verso il centro
+                x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
               var y = centri[i*2 + 1];
-              if(isClosed){
-                  
-                  y = centri[i*2 +1] + distanza[i] * Math.cos(angolo) * Math.sin(alphaCorrente);
-              }
-
+              if(isClosed) 
+                y = centri[i*2 +1] + distanza[i] * Math.cos(angolo) * Math.sin(alphaCorrente);
               var z = distanza[i] * Math.sin(angolo);
-
 
               vertices.push(x);        // x
               vertices.push(y);        // y
@@ -397,31 +342,22 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
 
               angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-              if(j == 3){
-                colors.push(1);
-                colors.push(1);
-                colors.push(1);
-              }
-              else{
-                colors.push(g_colors[0]);
+              colors.push(g_colors[0]);
               colors.push(g_colors[1]);
               colors.push(g_colors[2]);  
-              }
               
-
           }
           if( distanza[i-1] == 0 ){ // Se il precedente era un punto con distanza 0
 
               for( var j = 0; j < precisioneC ; j++ ){
-
                   indices[ind] = tempInd;
                   indices[ind+1] = tempInd2+1;
                   indices[ind+2] = tempInd2+2;
                   ind = ind + 3;
                   tempInd2 = tempInd2 + 1;
-                  
               }
               indices[ind-1] = tempInd + 1;
+
           }else{  // Se il precedente era un poligono
 
               // Ogni due lati, un quadrato tra loro e i loro corrispondenti nell'ultimo poligono
@@ -478,14 +414,12 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
           colors[colors.length -2] = 1;
           colors[colors.length -3] = 1;
 
-
           if( i != 0 ){
 
               tempInd = tempInd2 + 1;
               tempInd2 = tempInd2 - precisioneC + 1;
 
               for( var j = 0; j < precisioneC; j++ ){
-
                   indices[ind] = tempInd;
                   indices[ind+1] = tempInd2;
                   indices[ind+2] = tempInd2+1;
@@ -496,8 +430,6 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
           }
       }
   }
-  //console.log("vertici:", vertices);
-
 
   // Write the vertex property to buffers (coordinates, colors and normals)
   if (!initArrayBuffer(gl, 'a_Position', new Float32Array(vertices),       3, gl.FLOAT)) return -1;
@@ -517,76 +449,6 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
 
   return indices.length;
 }
-
-
-
-
-function initVertexBuffers(gl) {
-    // Create a cube
-    //    v6----- v5
-    //   /|      /|
-    //  v1------v0|
-    //  | |     | |
-    //  | |v7---|-|v4
-    //  |/      |/
-    //  v2------v3
-    // Coordinates
-    var vertices = new Float32Array([
-       1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0,-1.0, 1.0,   1.0,-1.0, 1.0, // v0-v1-v2-v3 front
-       1.0, 1.0, 1.0,   1.0,-1.0, 1.0,   1.0,-1.0,-1.0,   1.0, 1.0,-1.0, // v0-v3-v4-v5 right
-       1.0, 1.0, 1.0,   1.0, 1.0,-1.0,  -1.0, 1.0,-1.0,  -1.0, 1.0, 1.0, // v0-v5-v6-v1 up
-      -1.0, 1.0, 1.0,  -1.0, 1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0,-1.0, 1.0, // v1-v6-v7-v2 left
-      -1.0,-1.0,-1.0,   1.0,-1.0,-1.0,   1.0,-1.0, 1.0,  -1.0,-1.0, 1.0, // v7-v4-v3-v2 down
-       1.0,-1.0,-1.0,  -1.0,-1.0,-1.0,  -1.0, 1.0,-1.0,   1.0, 1.0,-1.0  // v4-v7-v6-v5 back
-    ]);
-/*
-    // Colors
-    var colors = new Float32Array([    // Colors
-      1, 0, 0,   1, 0, 0,   1, 0, 0,  1, 0, 0,     // v0-v1-v2-v3 front
-      1, 0, 0,   1, 0, 0,   1, 0, 0,  1, 0, 0,     // v0-v3-v4-v5 right
-      1, 0, 0,   1, 0, 0,   1, 0, 0,  1, 0, 0,     // v0-v5-v6-v1 up
-      1, 0, 0,   1, 0, 0,   1, 0, 0,  1, 0, 0,     // v1-v6-v7-v2 left
-      1, 0, 0,   1, 0, 0,   1, 0, 0,  1, 0, 0,     // v7-v4-v3-v2 down
-      1, 0, 0,   1, 0, 0,   1, 0, 0,  1, 0, 0 　    // v4-v7-v6-v5 back
-    ]);
-*/
-    var colors = new Float32Array(72);
-    for(var i=0; i < 24; i++){
-      colors[i*3] = g_colors[0];
-      colors[i*3+1] = g_colors[1];
-      colors[i*3+2] = g_colors[2];
-    }
-
-    // Indices of the vertices
-    var indices = new Uint8Array([
-       0, 1, 2,   0, 2, 3,    // front
-       4, 5, 6,   4, 6, 7,    // right
-       8, 9,10,   8,10,11,    // up
-      12,13,14,  12,14,15,    // left
-      16,17,18,  16,18,19,    // down
-      20,21,22,  20,22,23     // back
-    ]);
-
-    // Write the vertex property to buffers (coordinates, colors and normals)
-    if (!initArrayBuffer(gl, 'a_Position', vertices,       3, gl.FLOAT)) return -1;
-    if (!initArrayBuffer(gl, 'a_Color',    colors,  3, gl.FLOAT)) return -1;
-
-    // Unbind the buffer object
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-    // Write the indices to the buffer object
-    var indexBuffer = gl.createBuffer();
-    if (!indexBuffer) {
-      console.log('Failed to create the buffer object');
-      return false;
-    }
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-
-    return indices.length;
-}
-
-
 
 
 function initArrayBuffer(gl, attribute, data, num, type) {
@@ -611,12 +473,10 @@ function initArrayBuffer(gl, attribute, data, num, type) {
     return true;
 }
 
-
 // Rotation angle (degrees/second)
 var ANGLE_STEP = 10.0; //10
 // Last time that this function was called
 var g_last = Date.now();
-
 
 function animate(angle) {
     // Calculate the elapsed time
