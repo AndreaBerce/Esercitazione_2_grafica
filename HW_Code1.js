@@ -233,7 +233,7 @@ function main() {
      //n = initVertexBuffers(gl);
      centri = [];
      dimensioni = [];
-     precisioneC = 10;
+     precisioneC = 8;
      // Genero i punti del cerchio principale
      raggio = 1.1;
      var raggino = 0.3;
@@ -273,7 +273,7 @@ function main() {
   //*********************************************************************************
   var tick = function() {
 
-      //currentAngle = animate(currentAngle);  // Update the rotation angle
+      currentAngle = animate(currentAngle);  // Update the rotation angle
       // Calculate the model matrix
       modelMatrix.setRotate(currentAngle, -1, 0, 0); // Rotate around the y-axis
 
@@ -345,7 +345,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
 
   // Controllo se è un solido chiuso
   if(centri[0] == centri[centri.length-2] && centri[1] == centri[centri.length-1])  isClosed = true;
-
+  // Calcolo il centro tra tutti i vertici della figura. Se è chiusa, lo usiamo
   xCentro = 0;
   yCentro = 0;
   for(var i=0; i<centri.length/2; i++){
@@ -358,7 +358,7 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   console.log("Centro della figura = (" +xCentro+ "," +yCentro+ ")");
 
 
-  var angolo = Math.PI / 4;
+  var angolo = 0;
   var ind = 0; // TODO: forse si può togliere gli ind per usare invece push
   var tempInd = 0;
   var tempInd2 = 0;
@@ -375,23 +375,40 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
       var m1 = (y2-y1)/(x2-x1); // Trovo la m del poligono corrente
 
       var alphaCorrente = Math.atan(m1);
+      /*
+      if((Math.cos(alphaCorrente) < 0 && Math.sin(alphaCorrente) > 0) || (Math.cos(alphaCorrente) > 0 && Math.sin(alphaCorrente) < 0)){
+          alphaCorrente += Math.PI;
+      }*/
+      //TODO: se funziona, togliere il primo if che è superfluo
+      
+      //if(i-1 > precisioneC/4*1 && i-1 < precisioneC/4*2 || i-1 > precisioneC/4*3 && i-1 < precisioneC/4*4){
+          //alphaCorrente += Math.PI;
+          //console.log("Siamo nell 2* o 4* quadrante. Angolo: ", alphaCorrente);
+      //}
+
+      // Nuovo tentativo: trovo l'angolo attraverso le operazioni vettoriali
+      //alphaCorrente = Math.acos( (x2*1 + y2*0) / Math.sqrt(x2*x2 + y2*y2));
+      if(i == 0 || (i-2) == precisioneC) alphaCorrente = 0;
+      else alphaCorrente = (i-1) * 2*Math.PI/precisioneC;
 
       var q = y2 - m1*x2;
 
       console.log("Angolo: "+ alphaCorrente);
 
       if(distanza[i] > 0){  // Se deve essere un poligono
-
+        
           // Intanto dobbiamo in ogni caso calcolare i punti dell'nAgono che lo circonda.
           for(var j = 0; j < precisioneC; j++){
 
               var x = centri[i*2] + distanza[i] * Math.cos(angolo);
               if(isClosed){
-                  x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
+                  
+                    x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
               }
 
               var y = centri[i*2 + 1];
               if(isClosed){
+                  
                   y = centri[i*2 +1] + distanza[i] * Math.cos(angolo) * Math.sin(alphaCorrente);
               }
 
@@ -404,11 +421,17 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
 
               angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-
-              //TEST colorstep
-              colors.push(g_colors[0]);
+              if(j == 3){
+                colors.push(1);
+                colors.push(1);
+                colors.push(1);
+              }
+              else{
+                colors.push(g_colors[0]);
               colors.push(g_colors[1]);
-              colors.push(g_colors[2]);
+              colors.push(g_colors[2]);  
+              }
+              
 
           }
           if( distanza[i-1] == 0 ){ // Se il precedente era un punto con distanza 0
@@ -614,7 +637,7 @@ function initArrayBuffer(gl, attribute, data, num, type) {
 
 
 // Rotation angle (degrees/second)
-var ANGLE_STEP = 10; //10
+var ANGLE_STEP = 10.0; //10
 // Last time that this function was called
 var g_last = Date.now();
 
