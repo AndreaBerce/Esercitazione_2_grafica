@@ -75,11 +75,33 @@ function main() {
   //var n = initVertexBuffersCube(gl);
 
 
-  var centri = new Float32Array([0,1, 0,1, 0,-1, 0,-1]);
-  var dimensioni = new Float32Array([0, 1, 1, 0]);
-  var precisioneC = 300;
 
-  var n = genericHedron(gl, centri, dimensioni, precisioneC);
+  var centri = [];
+  var dimensioni = [];
+  var precisioneC = 125;
+
+  // Genero i punti del cerchio principale
+  var raggione = 1.1;
+  var raggino = 0.3;
+
+  for(var i = 0; i <= 2*Math.PI; i+= 2*Math.PI/precisioneC){
+     centri.push(raggione * Math.cos(i));                                // x
+     centri.push(raggione * Math.sin(i));                                // y
+     dimensioni.push(raggino);                                           // Raggio dei cerchi
+  }
+
+  //Il primo elemento si ripete
+  centri.unshift(centri[1]);
+  centri.unshift(centri[1]); //Pusho di nuovo lo stesso perché ora sono shiftati dopo il primo unshift
+  dimensioni.unshift(0);
+  //Ripeto anche l'ultimo, che sarà uguale al primo essendo una figura chiusa.
+  centri.push(centri[0]);
+  centri.push(centri[1]);
+  dimensioni.push(raggino);
+
+  var n = circleDrag(gl, new Float32Array(centri), new Float32Array(dimensioni), precisioneC);
+  //var n = circleDrag(gl, [0,0.8, 0,0.8, 0,-0.8, 0,-0.8], [0, 0.8*Math.sqrt(2), 0.8*Math.sqrt(2), 0], 4);
+
 
 
 
@@ -473,7 +495,11 @@ function main() {
 
 
 
-function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri, distanza punti da centri, precisione cerchi
+
+
+function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, distanza punti da centri, precisione cerchi
+  var isClosed = false; // Variabile che dice se la figura è chiusa
+
   // calcolo numero di vertici della figura
   var nv = 0; // numero vertici
   var ni = 0; // numero indici
@@ -500,97 +526,209 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
   var vertices = new Float32Array(nv);
 
   // Indices of the vertices
-  var indices = new Uint32Array(ni);
+  var indices = new Uint16Array(ni);
 
+  // Controllo se è un solido chiuso
+  if(centri[0] == centri[centri.length-2] && centri[1] == centri[centri.length-1]){
+    isClosed = true;
+  }
+
+  var angolo = Math.PI/4;
+  var alphaPrecedente = 0;
   var count = 0;
-  var angolo = Math.PI / 4;
   var ind = 0;
   var ind2 = 0;
+  var x;
+  var y;
+  var z;
+  for(var i = 0; i < (centri.length / 2); i++ ){  // Per ognuno dei punti ricevuti
+      //stfu gli altri <3
 
-  for( var i = 0; i < (centri.length / 2); i++ ){
-      if( distanza[i] > 0 ){
-          if( distanza[i-1] == 0 ){ // se prima c'era un punto
-              for(var j = 0; j < precisioneC; j++){
-                  vertices[count] = centri[(i-1) * 2];                                    // x del punto
-                  vertices[count+1] = centri[(i-1) * 2 + 1];                              // y del punto
+      // Trovo l'angolo corrente sul cerchio principale
+      if(i == 0 || (i-2) == precisioneC){
+          alphaCorrente = 0;
+      }else{
+          alphaCorrente = (i-1) * 2*Math.PI/precisioneC;
+      }
+
+      if(distanza[i] > 0){  // Se deve essere un poligono
+          if( distanza[i-1] == 0 ){
+              for( var j = 0; j < precisioneC; j++ ){
+                  vertices[count] = centri[(i-1) * 2];
+                  vertices[count+1] = centri[(i-1) * 2 +1];
                   vertices[count+2] = 0;
 
-                  vertices[count+3] = centri[i*2] + distanza[i] * Math.cos(angolo);       // x
-                  vertices[count+4] = centri[i*2 + 1];                                    // y
-                  vertices[count+5] = distanza[i] * Math.sin(angolo);                     // Z
+                  // Calcolo delle coordinate dei punti sui cerchi minori
+                  x = centri[i*2] + distanza[i] * Math.cos(angolo);
+                  if(isClosed){ // Se è chiuso i cerchi non saranno tutti angolati 0, ma verso il centro
+                      x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
+                  }
+                  y = centri[i*2 + 1];
+                  if(isClosed){
+                      y = centri[i*2 +1] + distanza[i] * Math.cos(angolo) * Math.sin(alphaCorrente);
+                  }
+                  z = distanza[i] * Math.sin(angolo);
+
+                  vertices[count+3] = x;
+                  vertices[count+4] = y;
+                  vertices[count+5] = z;
+
 
                   angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-                  vertices[count+6] = centri[i*2] + distanza[i] * Math.cos(angolo);       // x
-                  vertices[count+7] = centri[i*2 + 1];                                    // y
-                  vertices[count+8] = distanza[i] * Math.sin(angolo);                     // Z
+                  x = centri[i*2] + distanza[i] * Math.cos(angolo);
+                  if(isClosed){ // Se è chiuso i cerchi non saranno tutti angolati 0, ma verso il centro
+                      x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
+                  }
+                  y = centri[i*2 + 1];
+                  if(isClosed){
+                      y = centri[i*2 +1] + distanza[i] * Math.cos(angolo) * Math.sin(alphaCorrente);
+                  }
+                  z = distanza[i] * Math.sin(angolo);
 
-                  indices[ind] = ind2;
+                  vertices[count+6] = x;
+                  vertices[count+7] = y;
+                  vertices[count+8] = z;
+
+                  indices[ind] = ind2+2;
                   indices[ind+1] = ind2+1;
-                  indices[ind+2] = ind2+2;
+                  indices[ind+2] = ind2;
 
                   ind = ind + 3;
                   ind2 = ind2 + 3;
                   count = count + 9;
               }
-          }else{ // se prima c'era un poligolo
-              //console.log("vertici:", vertices);
-              for( var j = 0; j < precisioneC; j++ ){
-                  //1
-                  vertices[count+6] = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo); // x
-                  vertices[count+7] = centri[(i-1)*2 + 1];                                // y
-                  vertices[count+8] = distanza[i-1] * Math.sin(angolo);                   // Z
+              alphaPrecedente = alphaCorrente;
 
-                  //5
-                  vertices[count] = centri[i*2] + distanza[i] * Math.cos(angolo);         // x
-                  vertices[count+1] = centri[i*2 + 1];                                    // y
-                  vertices[count+2] = distanza[i] * Math.sin(angolo);                     // Z
+          }else{
+              for( var j = 0; j < precisioneC; j++ ){
+                  x = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo);
+                  if(isClosed){ // Se è chiuso i cerchi non saranno tutti angolati 0, ma verso il centro
+                      x = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo) * Math.cos(alphaPrecedente);
+                  }
+                  y = centri[(i-1)*2 + 1];
+                  if(isClosed){
+                      y = centri[(i-1)*2 +1] + distanza[i-1] * Math.cos(angolo) * Math.sin(alphaPrecedente);
+                  }
+                  z = distanza[i-1] * Math.sin(angolo);
+
+                  vertices[count+6] = x;
+                  vertices[count+7] = y;
+                  vertices[count+8] = z;
+
+
+                  x = centri[i*2] + distanza[i] * Math.cos(angolo);
+                  if(isClosed){ // Se è chiuso i cerchi non saranno tutti angolati 0, ma verso il centro
+                      x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
+                  }
+                  y = centri[i*2 + 1];
+                  if(isClosed){
+                      y = centri[i*2 +1] + distanza[i] * Math.cos(angolo) * Math.sin(alphaCorrente);
+                  }
+                  z = distanza[i] * Math.sin(angolo);
+
+                  vertices[count] = x;
+                  vertices[count+1] = y;
+                  vertices[count+2] = z;
+
 
                   angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-                  //6
-                  vertices[count+3] = centri[i*2] + distanza[i] * Math.cos(angolo);       // x
-                  vertices[count+4] = centri[i*2 + 1];                                    // y
-                  vertices[count+5] = distanza[i] * Math.sin(angolo);                     // Z
+                  x = centri[i*2] + distanza[i] * Math.cos(angolo);
+                  if(isClosed){ // Se è chiuso i cerchi non saranno tutti angolati 0, ma verso il centro
+                      x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
+                  }
+                  y = centri[i*2 + 1];
+                  if(isClosed){
+                      y = centri[i*2 +1] + distanza[i] * Math.cos(angolo) * Math.sin(alphaCorrente);
+                  }
+                  z = distanza[i] * Math.sin(angolo);
 
-                  indices[ind] = ind2;  // 5
-                  indices[ind+1] = ind2+1;  // 6
-                  indices[ind+2] = ind2+2;  // 1
+                  vertices[count+3] = x;
+                  vertices[count+4] = y;
+                  vertices[count+5] = z;
 
-                  //2
-                  vertices[count+9] = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo); // x
-                  vertices[count+10] = centri[(i-1)*2 + 1];                               // y
-                  vertices[count+11] = distanza[i-1] * Math.sin(angolo);                  // Z
 
-                  indices[ind+3] = ind2+2; // 1
-                  indices[ind+4] = ind2+1; // 6
-                  indices[ind+5] = ind2+3; // 2
+                  indices[ind] = ind2+2;
+                  indices[ind+1] = ind2+1;
+                  indices[ind+2] = ind2;
+
+
+                  x = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo);
+                  if(isClosed){ // Se è chiuso i cerchi non saranno tutti angolati 0, ma verso il centro
+                      x = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo) * Math.cos(alphaPrecedente);
+                  }
+                  y = centri[(i-1)*2 + 1];
+                  if(isClosed){
+                      y = centri[(i-1)*2 +1] + distanza[i-1] * Math.cos(angolo) * Math.sin(alphaPrecedente);
+                  }
+                  z = distanza[i-1] * Math.sin(angolo);
+
+                  vertices[count+9] = x;
+                  vertices[count+10] = y;
+                  vertices[count+11] = z;
+
+                  indices[ind+3] = ind2+3;
+                  indices[ind+4] = ind2+1;
+                  indices[ind+5] = ind2+2;
 
                   ind = ind + 6;
                   ind2 = ind2 + 4;
                   count = count + 12;
               }
+              alphaPrecedente = alphaCorrente;
           }
-      }else{
-          if( i > 0 && distanza[i-1] != 0 ){ // se prima c'era un poligono
-              //console.log("angolo = ", angolo);
+      }else{  // Se il precedente era un poligono
+
+          // Ogni due lati, un quadrato tra loro e i loro corrispondenti nell'ultimo poligono
+          // Se ho per esempio due quadrati e devo fare gli indici dei triangolini in mezzo:
+          /*
+          Precisione : 5
+          indici da mettere:
+          9,8,4,    4,3,8,    8,7,3,    3,2,7,    7,6,2,    2,1,6,    6,9,1,    1,4,9
+
+          1---------2                             6---------7
+          |         |                             |         |
+          |    0    |    la parte prima,          |    5    |    la parte seconda
+          |         |                             |         |
+          4---------3                             9---------8
+          */
+
+          if( i > 0 && distanza[i-1] != 0){
               for( var j = 0; j < precisioneC; j++ ){
-                  vertices[count+6] = centri[i * 2];                                      // x del punto
-                  vertices[count+7] = centri[i * 2 + 1];                                  // y del punto
+                  vertices[count+6] = centri[i*2];
+                  vertices[count+7] = centri[i*2 + 1];
                   vertices[count+8] = 0;
 
-                  vertices[count+3] = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo); // x
-                  vertices[count+4] = centri[(i-1)*2 + 1];                                // y
-                  vertices[count+5] = distanza[i-1] * Math.sin(angolo);                   // Z
+                  x = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo);
+                  if(isClosed){ // Se è chiuso i cerchi non saranno tutti angolati 0, ma verso il centro
+                      x = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo) * Math.cos(alphaPrecedente);
+                  }
+                  y = centri[(i-1)*2 + 1];
+                  if(isClosed){
+                      y = centri[(i-1)*2 +1] + distanza[i-1] * Math.cos(angolo) * Math.sin(alphaPrecedente);
+                  }
+                  z = distanza[i-1] * Math.sin(angolo);
+
+                  vertices[count+3] = x;
+                  vertices[count+4] = y;
+                  vertices[count+5] = z;
 
                   angolo = angolo + ( 2 * Math.PI/precisioneC );
 
-                  vertices[count] = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo);   // x
-                  vertices[count+1] = centri[(i-1)*2 + 1];                                // y
-                  vertices[count+2] = distanza[i-1] * Math.sin(angolo);                   // Z
+                  x = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo);
+                  if(isClosed){ // Se è chiuso i cerchi non saranno tutti angolati 0, ma verso il centro
+                      x = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo) * Math.cos(alphaPrecedente);
+                  }
+                  y = centri[(i-1)*2 + 1];
+                  if(isClosed){
+                      y = centri[(i-1)*2 +1] + distanza[i-1] * Math.cos(angolo) * Math.sin(alphaPrecedente);
+                  }
+                  z = distanza[i-1] * Math.sin(angolo);
 
-                  // console.log("angolo = ", angolo);
-                  // console.log("valori: ", vertices[count], vertices[count+1], vertices[count+2], vertices[count+3], vertices[count+4], vertices[count+5], vertices[count+6], vertices[count+7], vertices[count+8]);
+                  vertices[count] = x;
+                  vertices[count+1] = y;
+                  vertices[count+2] = z;
 
                   indices[ind] = ind2;
                   indices[ind+1] = ind2+1;
@@ -599,27 +737,19 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
                   ind = ind + 3;
                   ind2 = ind2 + 3;
                   count = count + 9;
-
-                  // console.log("j = ", j);
-                  // console.log("count = ", count);
               }
+              alphaPrecedente = alphaCorrente;
           }
       }
-      //console.log("vertici:", vertices);
-      //console.log("indici:", indices);
   }
-  //console.log("vertici:", vertices);
+
+
 
 
   var normals = new Float32Array(vertices.length);
   var temp = new Float32Array(10);
   count = 0;
   for( var  i = 0; i < (indices.length / 3) ; i++){
-      // console.log("indici:", indices);
-      // console.log("indici considerati:", indices[i*3], indices[i*3+1], indices[i*3+2]);
-      // console.log(vertices[indices[i*3]*3], vertices[indices[i*3]*3 + 1], vertices[indices[i*3]*3 + 2]);
-      // console.log(vertices[indices[i*3+1]*3], vertices[indices[i*3+1]*3 + 1], vertices[indices[i*3+1]*3 + 2]);
-      // console.log(vertices[indices[i*3+2]*3], vertices[indices[i*3+2]*3 + 1], vertices[indices[i*3+2]*3 + 2]);
 
       temp[0] = vertices[indices[i*3]*3] - vertices[indices[i*3+1]*3];
       temp[1] = vertices[indices[i*3]*3 + 1] - vertices[indices[i*3+1]*3 + 1];
@@ -635,22 +765,14 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
       if(temp[6] == 0){temp[6] = 0;}
       if(temp[7] == 0){temp[7] = 0;}
       if(temp[8] == 0){temp[8] = 0;}
-      // console.log(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]);
-      //console.log(temp[6], temp[7], temp[8]);
 
       temp[9] = Math.sqrt( temp[6]*temp[6] + temp[7]*temp[7] + temp[8]*temp[8] );
-      //console.log("|n| = ",temp[9]);
 
       for( var j = 0; j < 3; j++){
           normals[indices[i*3+j]*3] = temp[6] / temp[9];
           normals[indices[i*3+j]*3+1] = temp[7] / temp[9];
           normals[indices[i*3+j]*3+2] = temp[8] / temp[9];
       }
-
-      // console.log("i = ",i*3, "   i + 1 = ", (i*3+1), "   i + 2 = ", (i*3+2));
-      // console.log(i, " nuova normale:", normals[indices[i*3+j]*3], normals[indices[i*3+j]*3+1], normals[indices[i*3+j]*3// +2]);
-      // console.log("normali:",normals);
-
   }
 
 
@@ -674,7 +796,6 @@ function genericHedron(gl, centri, distanza, precisioneC){  //coordinate centri,
 
   return indices.length;
 }
-
 
 
 

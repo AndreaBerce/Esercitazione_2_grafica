@@ -321,10 +321,10 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
 
       // Trovo l'angolo corrente sul cerchio principale
       if(i == 0 || (i-2) == precisioneC) alphaCorrente = 0;
-      else alphaCorrente = (i-1) * 2*Math.PI/precisioneC; 
+      else alphaCorrente = (i-1) * 2*Math.PI/precisioneC;
 
       if(distanza[i] > 0){  // Se deve essere un poligono
-        
+
           // Intanto dobbiamo in ogni caso calcolare i punti dell'nAgono che lo circonda.
           for(var j = 0; j < precisioneC; j++){
               // Calcolo delle coordinate dei punti sui cerchi minori
@@ -332,7 +332,7 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
               if(isClosed) // Se è chiuso i cerchi non saranno tutti angolati 0, ma verso il centro
                 x = centri[i*2] + distanza[i] * Math.cos(angolo) * Math.cos(alphaCorrente);
               var y = centri[i*2 + 1];
-              if(isClosed) 
+              if(isClosed)
                 y = centri[i*2 +1] + distanza[i] * Math.cos(angolo) * Math.sin(alphaCorrente);
               var z = distanza[i] * Math.sin(angolo);
 
@@ -344,8 +344,8 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
 
               colors.push(g_colors[0]);
               colors.push(g_colors[1]);
-              colors.push(g_colors[2]);  
-              
+              colors.push(g_colors[2]);
+
           }
           if( distanza[i-1] == 0 ){ // Se il precedente era un punto con distanza 0
 
@@ -407,12 +407,12 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
 
           // Coloriamo bianchi il primo e ultimo punto, in modo che si capisca se la figura è corretta
           // anche senza shader per la luce.
-          colors[0] = 1;
-          colors[1] = 1;
-          colors[2] = 1;
-          colors[colors.length-1] = 1;
-          colors[colors.length -2] = 1;
-          colors[colors.length -3] = 1;
+          // colors[0] = 1;
+          // colors[1] = 1;
+          // colors[2] = 1;
+          // colors[colors.length-1] = 1;
+          // colors[colors.length -2] = 1;
+          // colors[colors.length -3] = 1;
 
           if( i != 0 ){
 
