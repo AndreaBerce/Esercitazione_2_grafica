@@ -623,9 +623,15 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
                   vertices[count+7] = y;
                   vertices[count+8] = z;
 
-                  indices[ind] = ind2+2;
-                  indices[ind+1] = ind2+1;
-                  indices[ind+2] = ind2;
+                  if( isClosed ){
+                      indices[ind] = ind2+2;
+                      indices[ind+1] = ind2+1;
+                      indices[ind+2] = ind2;
+                  }else{
+                    indices[ind] = ind2;
+                    indices[ind+1] = ind2+1;
+                    indices[ind+2] = ind2+2;
+                  }
 
                   ind = ind + 3;
                   ind2 = ind2 + 3;
@@ -682,9 +688,15 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
                   vertices[count+5] = z;
 
 
-                  indices[ind] = ind2+2;
-                  indices[ind+1] = ind2+1;
-                  indices[ind+2] = ind2;
+                  if( isClosed ){
+                      indices[ind] = ind2+2;
+                      indices[ind+1] = ind2+1;
+                      indices[ind+2] = ind2;
+                  }else{
+                    indices[ind] = ind2;
+                    indices[ind+1] = ind2+1;
+                    indices[ind+2] = ind2+2;
+                  }
 
 
                   x = centri[(i-1)*2] + distanza[i-1] * Math.cos(angolo);
@@ -701,9 +713,15 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
                   vertices[count+10] = y;
                   vertices[count+11] = z;
 
-                  indices[ind+3] = ind2+3;
-                  indices[ind+4] = ind2+1;
-                  indices[ind+5] = ind2+2;
+                  if( isClosed ){
+                      indices[ind+3] = ind2+3;
+                      indices[ind+4] = ind2+1;
+                      indices[ind+5] = ind2+2;
+                  }else{
+                    indices[ind+3] = ind2+2;
+                    indices[ind+4] = ind2+1;
+                    indices[ind+5] = ind2+3;
+                  }
 
                   ind = ind + 6;
                   ind2 = ind2 + 4;
