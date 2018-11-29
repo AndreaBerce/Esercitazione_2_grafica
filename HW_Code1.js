@@ -221,7 +221,7 @@ function main() {
      // Genero i punti del cerchio principale
      raggione = 1.1;
      var raggino = 0.3;
-
+     // Calcolo i punti della circonferenza principale
      for(var i = 0; i <= 2*Math.PI; i+= 2*Math.PI/precisioneC){
         centri.push(raggione * Math.cos(i));                                // x
         centri.push(raggione * Math.sin(i));                                // y
@@ -267,10 +267,29 @@ function main() {
   tick();
 }
 
+/*
+circleDrag():
+Funzione generica che calcola un solido costituito da una serie di punti e circonferenze in essi
+incentrate. Se la serie di punti rappresenta una figura chiusa (se l'ultimo punto coincide con il primo),
+allora i cerchi saranno angolati a intervalli regolari in base alla precisione.
+Il cerchio #m di una figura con #n cerchi totali, sarà angolato a (2Pi)/n *m.
+Ad ogni ciclo, la funzione calcola i punti e disegna lunione tra il poligono/punto corrente e
+il poligono/punto precedente.
+
+INPUT:
+gl           (gl):   Rendering context per WebGL
+centri (float[2*n]): Array di punti intorno al quale disegnare cerchi.
+raggio (float[n]):   Ogni numero è il raggio del cerchio corrispondente.
+precisioneC (int):   Precisione dei cerchi da disegnare o numero di lati del polinomio.
+
+OUTPUT:
+n        (int):     Lunghezza dell'array degli indici generato.
+*/
+
 function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, distanza punti da centri, precisione cerchi
   var isClosed = false; // Variabile che dice se la figura è chiusa
 
-  // calcolo numero di vertici della figura
+  // Calcolo numero di vertici e indici della figura
   var nv = 0; // numero vertici
   var ni = 0; // numero indici
   var precedentePunto=true;
@@ -304,15 +323,15 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
     colors.push(g_colors[2]);
   }
 
-  // Indices of the vertices
+  // Creazion e del vettore degli indici
   var indices = new Uint16Array(ni);
 
-  // Controllo se è un solido chiuso
+  // Controllo se è un solido chiuso, ovvero se il primo centro coincide con l'ultimo
   if(centri[0] == centri[centri.length-2] && centri[1] == centri[centri.length-1]){
     isClosed = true;
   }
 
-  var angolo = Math.PI/4;
+  var angolo = Math.PI/4; // Angolo da cui partire nei cerchi minori. 0 corrisponde a "verso l'osservatore"
   var ind = 0;
   var tempInd = 0;
   var tempInd2 = 0;
@@ -327,6 +346,7 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
 
           // Intanto dobbiamo in ogni caso calcolare i punti dell'nAgono che lo circonda.
           for(var j = 0; j < precisioneC; j++){
+
               // Calcolo delle coordinate dei punti sui cerchi minori
               var x = centri[i*2] + distanza[i] * Math.cos(angolo);
               if(isClosed) // Se è chiuso i cerchi non saranno tutti angolati 0, ma verso il centro
@@ -348,7 +368,7 @@ function circleDrag(gl, centri, distanza, precisioneC){  //coordinate centri, di
 
           }
           if( distanza[i-1] == 0 ){ // Se il precedente era un punto con distanza 0
-
+              
               for( var j = 0; j < precisioneC ; j++ ){
                   indices[ind] = tempInd;
                   indices[ind+1] = tempInd2+1;
